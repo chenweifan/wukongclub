@@ -5,6 +5,7 @@ import { Outlet } from 'react-router-dom';
 import { ConfirmDialogHost } from '@/components/ui/ConfirmDialog';
 import { ToastHost } from '@/components/ui/Toast';
 import { useDemoStore } from '@/demo/demoStore';
+import { useSessionLifecycle } from '@/entities/session';
 
 /**
  * 演示浮层按需加载。
@@ -27,6 +28,9 @@ const DemoOverlay = lazy(async () => {
 export function RootShell() {
   const enabled = useDemoStore((state) => state.enabled);
   const clean = useDemoStore((state) => state.clean);
+
+  // 会话生命周期挂在这里：首屏用令牌换回用户 + 演示身份与登录态的联动
+  useSessionLifecycle();
 
   // 截图模式（clean）下演示浮层整块不渲染：既省掉一份渲染开销，也保证截图干净
   const shouldRenderDemo = (enabled && !clean) || import.meta.env.DEV;

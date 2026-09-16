@@ -1,13 +1,6 @@
-import { PagePlaceholder } from '@/components/ui/PagePlaceholder';
-import { COPY } from '@/utils/copy';
+import { LoginPanel } from '@/features/auth/LoginPanel';
 
-/** 登录：注册登录与天命人名片（阶段 2 交付，渲染在空白布局内）。 */
+/** 登录页：注册 / 登录 / 演示账号一键登录（渲染在空白布局内）。 */
 export function LoginPage() {
-  return (
-    <PagePlaceholder
-      pageName={COPY.nav.login}
-      phase="阶段 2"
-      description="注册登录与天命人名片将在此交付。"
-    />
-  );
+  return <LoginPanel />;
 }

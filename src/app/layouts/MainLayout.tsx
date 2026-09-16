@@ -5,6 +5,7 @@ import type { NavItem } from '@/app/navigation';
 import { UnofficialDisclaimer } from '@/components/business/UnofficialDisclaimer';
 import { ThemeSwitcher } from '@/components/ui/ThemeSwitcher';
 import { useDemoStore } from '@/demo/demoStore';
+import { SessionBadge } from '@/features/auth/SessionBadge';
 import { pushToast } from '@/stores/toastStore';
 import { useUiStore } from '@/stores/uiStore';
 import { cn } from '@/utils/cn';
@@ -123,12 +124,7 @@ export function MainLayout() {
               {COPY.layout.spoilerLabel}：{spoiler ? COPY.layout.spoilerOn : COPY.layout.spoilerOff}
             </button>
 
-            <Link
-              to="/login"
-              className="border-token border-line text-content-muted hover:text-accent hidden rounded-scroll border px-3 py-1.5 text-sm transition-colors duration-fast sm:block"
-            >
-              {COPY.nav.login}
-            </Link>
+            <SessionBadge />
           </div>
         </div>
       </header>

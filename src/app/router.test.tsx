@@ -6,6 +6,7 @@ import { AppProviders } from '@/app/providers';
 import { routes } from '@/app/router';
 import { RENDER_FUTURE_FLAGS, ROUTER_FUTURE_FLAGS } from '@/app/routerOptions';
 import { useDemoStore } from '@/demo/demoStore';
+import { COPY } from '@/utils/copy';
 
 function renderAt(path: string) {
   // 演示状态来自 window.location（DemoProvider 挂在 Router 之外），
@@ -114,5 +115,29 @@ describe('路由表', () => {
 
     expect(await screen.findByRole('heading', { level: 1, name: /粉丝互动站/ })).toBeVisible();
     expect(useDemoStore.getState().seed).toBe(777);
+  });
+
+  /* ── 阶段 2：成长中心的登录态同样由 URL 驱动 ───────────────────── */
+
+  it('role=guest 打开「我的」时展示登录引导，而不是四个失败的请求', async () => {
+    renderAt('/user?demo=1&role=guest');
+
+    expect(await screen.findByText(COPY.auth.needLoginTitle)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: COPY.auth.toLogin })).toBeInTheDocument();
+  });
+
+  it('role=active 打开「我的」会自动登录演示账号并渲染成长中心', async () => {
+    renderAt('/user?demo=1&role=active');
+
+    // 演示身份 → 自动登录 → 名片与三个面板
+    expect(await screen.findByRole('heading', { level: 1, name: COPY.growth.title })).toBeVisible();
+    expect(await screen.findByLabelText(COPY.growth.profile.title)).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: COPY.growth.checkIn.title })).toBeVisible();
+  });
+
+  it('role=banned 打开「我的」时给出封禁说明', async () => {
+    renderAt('/user?demo=1&role=banned');
+
+    expect(await screen.findByText(COPY.auth.bannedTitle)).toBeInTheDocument();
   });
 });

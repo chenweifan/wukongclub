@@ -9,6 +9,7 @@ import 'fake-indexeddb/auto';
 import { server } from '@/data/mocks/node';
 import { useDemoStore } from '@/demo/demoStore';
 import { resetRecorder } from '@/demo/recorder';
+import { useSessionStore } from '@/entities/session';
 import { useToastStore } from '@/stores/toastStore';
 
 /**
@@ -61,8 +62,9 @@ beforeAll(() => {
 afterEach(() => {
   server.resetHandlers();
   cleanup();
-  // 演示状态与提示是模块级 store，不隔离会让用例互相污染
+  // 演示状态、会话与提示都是模块级 store，不隔离会让用例互相污染
   useDemoStore.getState().reset();
+  useSessionStore.getState().markAnonymous();
   useToastStore.getState().clear();
   resetRecorder();
   window.localStorage.clear();

@@ -19,6 +19,15 @@ export default defineConfig({
     host: '127.0.0.1',
     open: false,
   },
+  optimizeDeps: {
+    /**
+     * 默认的依赖扫描入口是 `**\/*.html`，会把构建产物 storybook-static/ 一起扫进来，
+     * 进而尝试解析 Storybook 自己的 chunk（其中引用了本仓库没有的 @emotion/is-prop-valid），
+     * 在 dev 启动日志里刷出「could not be resolved」错误。
+     * 只把真正的应用入口交给预构建，问题消失且启动更快。
+     */
+    entries: ['index.html'],
+  },
   build: {
     outDir: 'dist',
     sourcemap: true,
