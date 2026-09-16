@@ -7,11 +7,14 @@ export const COPY = {
   site: {
     name: '黑神话悟空 · 非官方粉丝互动站',
     shortName: '悟空同人站',
-    tagline: '天命人自己的影神图、配装台与论坛',
+    tagline: '天命人自己的资讯、影神图与攻略',
     heroTitle: '黑神话悟空 · 粉丝互动站',
     heroEyebrow: '非官方粉丝作品',
     heroDescription:
-      '影神图百科、配装模拟器、互动地图与天命人论坛——全部数据在本地浏览器模拟，随时可重置。',
+      '资讯聚合、影神图百科、攻略库与天命人成长档案——全部数据在本地浏览器模拟，随时可重置。',
+    /** 首页交付范围说明：写清楚「有哪些、没有什么」，避免评审把占位页当成坏页面。 */
+    scopeNote:
+      '本次交付包含资讯、影神图、攻略、成长四个业务模块，以及贯穿全站的演示系统；其余模块（论坛、地图、配装、二创、活动、商城、后台）未在本次交付范围内。',
   },
 
   disclaimer: {
@@ -66,7 +69,9 @@ export const COPY = {
     backToSite: '返回前台',
     adminArea: '演示后台',
     plannedSections: '规划中的后台模块',
-    building: '建设中',
+    /** 未交付模块的统一标记：导航、卡片、后台占位共用同一个词。 */
+    notDelivered: '未交付',
+    delivered: '已交付',
   },
 
   theme: {
@@ -76,9 +81,14 @@ export const COPY = {
   },
 
   placeholder: {
-    /** 阶段 0 统一占位文案：「{{页面名}} · 建设中」 */
-    default: (pageName: string): string => `${pageName} · 建设中`,
-    hint: '本页将在后续阶段交付，当前仅验证路由与布局骨架。',
+    /** 未交付模块的占位页标题：「{{页面名}} · 未在本次交付范围内」。 */
+    default: (pageName: string): string => `${pageName} · 未在本次交付范围内`,
+    hint: '本站是一个按模块交付的演示项目：本页属于原计划模块，本次交付没有实现它，因此只保留路由与占位。',
+    /** 占位页上「原计划：<模块说明>」的前缀。 */
+    plannedPrefix: '原计划',
+    keptFor: '保留本页的原因：验证导航可达性与主题令牌，而不是留一个坏链接。',
+    deliveredTitle: '可以完整走通的模块',
+    deliveredHint: '下面四个模块是本次交付的实现范围：数据、加载/空/错/断网态与演示链接都已打通。',
   },
 
   common: {
@@ -106,7 +116,7 @@ export const COPY = {
 
   forbidden: {
     title: '403 · 无资格入内',
-    hint: '当前身份没有访问该区域的权限。可在演示控制台切换身份后重试。',
+    hint: '当前身份没有访问该区域的权限。可在演示控制台切换身份后重试；若目标是后台，请注意后台模块未在本次交付范围内。',
     currentRole: '当前身份',
   },
 
@@ -255,7 +265,7 @@ export const COPY = {
   probe: {
     title: '演示系统自检 · 探针列表',
     description:
-      '这一块是阶段 1 的自检面板：它真实走「Repository → MSW → IndexedDB」链路，用来验证加载 / 空 / 错误 / 断网 / 慢速五种状态，以及写操作持久化与快照备份。阶段 2 起会被真实业务列表取代。',
+      '演示系统的常驻自检面：真实走「Repository → MSW → IndexedDB」链路，用来验证加载 / 空 / 错误 / 断网 / 慢速五种状态，以及写操作持久化与快照备份。业务模块的数据由各自的列表页负责展示。',
     countLabel: (total: number): string => `共 ${total} 条探针`,
     toggle: (label: string, collected: boolean): string =>
       `${collected ? '取消勾选' : '勾选'} ${label}`,
@@ -320,6 +330,9 @@ export const COPY = {
   growth: {
     title: '成长中心',
     description: '签到、任务、消息都在这一页，数据全部保存在浏览器本地（IndexedDB）。',
+    /** 他人主页（`/user/:userId`）：该模块未交付，路由保留但显式说明。 */
+    otherProfile: '他人主页',
+    otherProfilePlan: '公开档案、发帖与收藏展示（个人主页模块）',
     checkIn: {
       title: '土地庙上香',
       action: '上香',

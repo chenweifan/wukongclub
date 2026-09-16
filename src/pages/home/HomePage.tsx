@@ -1,40 +1,43 @@
 import { Link } from 'react-router-dom';
 
+import { DELIVERED_NAV, PLANNED_NAV } from '@/app/navigation';
+import type { NavItem } from '@/app/navigation';
 import { DemoProbePanel } from '@/demo/panels/DemoProbePanel';
 import { COPY } from '@/utils/copy';
 
-interface ModuleCard {
-  to: string;
-  seal: string;
-  title: string;
-  description: string;
-  phase: string;
-}
+/**
+ * 首页模块卡片。
+ *
+ * 剩余模块已终止开发，因此首页必须先把「范围」说清楚：
+ * 已交付的四个模块是可以真正走通的入口，未交付的模块带明确标记，
+ * 点进去看到的是说明页而不是空白 —— 首页不承诺站点没有的东西。
+ */
+function ModuleCard({ item }: { item: NavItem }) {
+  const planned = item.status === 'planned';
 
-/** 首屏三张占位卡片：同时充当「主题令牌是否生效」的可视化自检面。 */
-const MODULE_CARDS: readonly ModuleCard[] = [
-  {
-    to: '/wiki',
-    seal: '鉴',
-    title: '影神图百科',
-    description: '卡片墙、词条对比与关联图谱，妖怪与人物的完整档案。',
-    phase: '阶段 2',
-  },
-  {
-    to: '/build-lab',
-    seal: '装',
-    title: '配装模拟器',
-    description: '槽位拖拽 + 属性实时计算，一键导出配装图并分享链接。',
-    phase: '阶段 3',
-  },
-  {
-    to: '/map',
-    seal: '图',
-    title: '互动地图',
-    description: '章节图层、点位聚合与收集进度，全部本地保存。',
-    phase: '阶段 3',
-  },
-];
+  return (
+    <Link
+      to={item.to}
+      className="panel-scroll texture-grain hover:border-line-strong block h-full p-6 transition-colors duration-fast"
+    >
+      <span className="flex items-center gap-3">
+        <span
+          aria-hidden="true"
+          className={`border-token border-line font-display flex h-9 w-9 items-center justify-center rounded-sm text-sm ${
+            planned ? 'text-content-muted' : 'text-accent'
+          }`}
+        >
+          {item.seal}
+        </span>
+        <span className="font-display text-base">{item.label}</span>
+        <span className="stamp ml-auto">
+          {planned ? COPY.layout.notDelivered : COPY.layout.delivered}
+        </span>
+      </span>
+      <span className="mt-3 block text-sm text-content-muted">{item.description}</span>
+    </Link>
+  );
+}
 
 /** 令牌色板：切换主题时应看到整组色块同时变化。 */
 const TOKEN_SWATCHES = [
@@ -56,6 +59,9 @@ export function HomePage() {
         <p className="mt-4 max-w-2xl text-sm text-content-muted md:text-base">
           {COPY.site.heroDescription}
         </p>
+        <p className="border-token border-line mt-4 max-w-3xl rounded-scroll border border-dashed p-3 text-xs leading-relaxed text-content-muted">
+          {COPY.site.scopeNote}
+        </p>
 
         <div className="mt-6 flex flex-wrap gap-3">
           <Link
@@ -65,10 +71,10 @@ export function HomePage() {
             {COPY.nav.wiki}
           </Link>
           <Link
-            to="/forum"
+            to="/guide"
             className="border-token border-line hover:text-accent rounded-scroll border px-4 py-2 text-sm"
           >
-            {COPY.nav.forum}
+            {COPY.nav.guide}
           </Link>
         </div>
       </section>
@@ -77,25 +83,22 @@ export function HomePage() {
         <h2 id="home-modules" className="text-lg">
           模块导航
         </h2>
-        <ul className="grid gap-4 md:grid-cols-3">
-          {MODULE_CARDS.map((card) => (
-            <li key={card.to}>
-              <Link
-                to={card.to}
-                className="panel-scroll texture-grain hover:border-line-strong block h-full p-6 transition-colors duration-fast"
-              >
-                <span className="flex items-center gap-3">
-                  <span
-                    aria-hidden="true"
-                    className="border-token border-line flex h-9 w-9 items-center justify-center rounded-sm font-display text-sm text-accent"
-                  >
-                    {card.seal}
-                  </span>
-                  <span className="font-display text-base">{card.title}</span>
-                  <span className="stamp ml-auto">{card.phase}</span>
-                </span>
-                <span className="mt-3 block text-sm text-content-muted">{card.description}</span>
-              </Link>
+
+        <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {DELIVERED_NAV.filter((item) => item.to !== '/').map((item) => (
+            <li key={item.to}>
+              <ModuleCard item={item} />
+            </li>
+          ))}
+        </ul>
+
+        <h3 className="pt-2 text-sm text-content-muted">
+          {COPY.layout.notDelivered}的模块（原计划）
+        </h3>
+        <ul className="grid gap-3 md:grid-cols-3">
+          {PLANNED_NAV.map((item) => (
+            <li key={item.to}>
+              <ModuleCard item={item} />
             </li>
           ))}
         </ul>
@@ -119,7 +122,7 @@ export function HomePage() {
         </ul>
       </section>
 
-      {/* 演示系统自检面板：阶段 1 的验收实物，阶段 2 起被真实业务列表取代 */}
+      {/* 演示系统自检面板：阶段 1 的验收实物，业务模块的数据由各自的 Repository 提供 */}
       <DemoProbePanel />
     </div>
   );

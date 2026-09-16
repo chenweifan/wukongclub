@@ -13,11 +13,19 @@ import { COPY } from '@/utils/copy';
 
 /** 侧栏条目（含单字印章图标 + 说明），折叠时只留印章。 */
 function SidebarItem({ item, collapsed }: { item: NavItem; collapsed: boolean }) {
+  const planned = item.status === 'planned';
+
   return (
     <NavLink
       to={item.to}
       end={item.to === '/'}
-      title={collapsed ? `${item.label} · ${item.description}` : undefined}
+      title={
+        collapsed
+          ? `${item.label} · ${item.description}`
+          : planned
+            ? `${item.label} · ${COPY.layout.notDelivered}`
+            : undefined
+      }
       className={({ isActive }) =>
         cn(
           'group flex items-center gap-3 rounded-scroll px-2 py-2 text-sm transition-colors duration-fast',
@@ -29,12 +37,18 @@ function SidebarItem({ item, collapsed }: { item: NavItem; collapsed: boolean })
     >
       <span
         aria-hidden="true"
-        className="border-token border-line flex h-7 w-7 shrink-0 items-center justify-center rounded-sm font-display text-xs"
+        className={cn(
+          'border-token border-line flex h-7 w-7 shrink-0 items-center justify-center rounded-sm font-display text-xs',
+          planned && 'opacity-60',
+        )}
       >
         {item.seal}
       </span>
       <span className={cn('truncate', collapsed && 'sr-only')}>{item.label}</span>
-      {collapsed ? null : (
+      {collapsed ? null : planned ? (
+        // 未交付模块在导航里就要看得出来：点进去是说明页，不是坏链接
+        <span className="stamp ml-auto shrink-0">{COPY.layout.notDelivered}</span>
+      ) : (
         <span className="ml-auto hidden text-[11px] text-content-muted xl:inline">
           {item.description}
         </span>
@@ -145,6 +159,11 @@ export function MainLayout() {
                 }
               >
                 {item.seal} {item.label}
+                {item.status === 'planned' ? (
+                  <span className="text-content-muted ml-1" aria-hidden="true">
+                    {COPY.layout.notDelivered}
+                  </span>
+                ) : null}
               </NavLink>
             </li>
           ))}

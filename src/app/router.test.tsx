@@ -3,6 +3,7 @@ import { RouterProvider, createMemoryRouter } from 'react-router-dom';
 import { describe, expect, it } from 'vitest';
 
 import { AppProviders } from '@/app/providers';
+import { DELIVERED_NAV, isDeliveredRoute } from '@/app/navigation';
 import { routes } from '@/app/router';
 import { RENDER_FUTURE_FLAGS, ROUTER_FUTURE_FLAGS } from '@/app/routerOptions';
 import { useDemoStore } from '@/demo/demoStore';
@@ -46,10 +47,51 @@ describe('路由表', () => {
     expect(screen.getByText(/非官方粉丝作品，与游戏科学/)).toBeInTheDocument();
   });
 
-  it('侧栏模块路由可达（以论坛为例）', async () => {
+  it('侧栏模块路由可达，未交付模块给出说明而不是坏页面（以论坛为例）', async () => {
     renderAt('/forum');
 
-    expect(await screen.findByRole('heading', { level: 1, name: /论坛 · 建设中/ })).toBeVisible();
+    expect(
+      await screen.findByRole('heading', { level: 1, name: /论坛 · 未在本次交付范围内/ }),
+    ).toBeVisible();
+  });
+
+  it('未交付的占位页列出已交付模块，用户不会走进死胡同', async () => {
+    renderAt('/forum');
+
+    const heading = await screen.findByRole('heading', {
+      level: 2,
+      name: COPY.placeholder.deliveredTitle,
+    });
+    const section = heading.closest('section');
+
+    expect(section?.querySelectorAll('a')).toHaveLength(DELIVERED_NAV.length);
+    for (const item of DELIVERED_NAV) {
+      expect(
+        section?.querySelector(`a[href="${item.to}"]`),
+        `缺少 ${item.to} 的入口`,
+      ).not.toBeNull();
+    }
+  });
+
+  it('顶部导航只放已交付模块（不制造指向未交付模块的入口）', async () => {
+    renderAt('/');
+
+    await screen.findByRole('heading', { level: 1, name: /粉丝互动站/ });
+
+    const topNav = screen.getByRole('navigation', { name: '主导航' });
+    const hrefs = [...topNav.querySelectorAll('a')].map((anchor) => anchor.getAttribute('href'));
+
+    expect(hrefs.length).toBeGreaterThan(0);
+    for (const href of hrefs) {
+      expect(isDeliveredRoute(href ?? ''), `${href} 不是已交付模块`).toBe(true);
+    }
+  });
+
+  it('影神图页带着引导剧本的跨页锚点（自动跨页那一步不会高亮不到东西）', async () => {
+    renderAt('/wiki');
+
+    await screen.findByRole('heading', { level: 1, name: COPY.wiki.title });
+    expect(document.querySelector('[data-tour="wiki-wall"]')).not.toBeNull();
   });
 
   it('guard：guest 访问 /admin 渲染 403 而不是跳转', async () => {

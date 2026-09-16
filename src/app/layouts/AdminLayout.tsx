@@ -52,7 +52,7 @@ export function AdminLayout() {
                 <span className="min-w-0">
                   <span className="flex items-center gap-2 text-sm">
                     {section.label}
-                    <span className="stamp">{COPY.layout.building}</span>
+                    <span className="stamp">{COPY.layout.notDelivered}</span>
                   </span>
                   <span className="mt-1 block text-xs text-content-muted">
                     {section.description}
