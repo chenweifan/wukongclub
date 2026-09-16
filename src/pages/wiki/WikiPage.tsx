@@ -28,13 +28,20 @@ import { describeUnknownError } from '@/utils/errorMessage';
  * - 图谱按需加载（ECharts 不进首屏）。
  */
 export function WikiPage() {
-  const { filters, query, setFilter, reset, hasActiveFilters } = useWikiFilters();
+  const {
+    filters,
+    query,
+    setFilter,
+    reset,
+    hasActiveFilters,
+    selectedEntryId,
+    setSelectedEntryId,
+  } = useWikiFilters();
   const listQuery = useWikiListQuery(query);
   const favoritesQuery = useFavoriteIdsQuery();
   const toggleFavorite = useToggleFavoriteMutation();
   const spoiler = useDemoStore((state) => state.spoiler);
 
-  const [activeEntryId, setActiveEntryId] = useState<string | null>(null);
   const [compareEntries, setCompareEntries] = useState<readonly WikiEntry[]>([]);
   const [favoritePendingId, setFavoritePendingId] = useState<string | null>(null);
 
@@ -116,7 +123,7 @@ export function WikiPage() {
         onClear={() => {
           setCompareEntries([]);
         }}
-        onOpen={setActiveEntryId}
+        onOpen={setSelectedEntryId}
       />
 
       <StateBoundary
@@ -145,7 +152,7 @@ export function WikiPage() {
             compareIds={compareIds}
             compareFull={compareFull}
             favoritePendingId={favoritePendingId}
-            onOpen={setActiveEntryId}
+            onOpen={setSelectedEntryId}
             onToggleFavorite={handleToggleFavorite}
             onToggleCompare={handleToggleCompare}
           />
@@ -153,14 +160,14 @@ export function WikiPage() {
       </StateBoundary>
 
       <WikiEntryDrawer
-        entryId={activeEntryId}
+        entryId={selectedEntryId}
         favoriteIds={favoriteIds}
         compareIds={compareIds}
         compareFull={compareFull}
         onClose={() => {
-          setActiveEntryId(null);
+          setSelectedEntryId(null);
         }}
-        onSelect={setActiveEntryId}
+        onSelect={setSelectedEntryId}
         onToggleFavorite={handleToggleFavorite}
         onToggleCompare={handleToggleCompare}
       />

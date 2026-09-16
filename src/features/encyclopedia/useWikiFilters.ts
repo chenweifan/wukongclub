@@ -19,6 +19,12 @@ export const WIKI_FILTER_PARAM_KEYS = [
   'wikiSort',
 ] as const;
 
+/**
+ * 详情抽屉参数。**故意不在** `WIKI_FILTER_PARAM_KEYS` 里：
+ * 点「清空筛选」时不该把用户正在看的词条一起关掉。
+ */
+export const WIKI_ENTRY_PARAM_KEY = 'wikiEntry';
+
 export interface WikiFilters {
   chapter?: Chapter;
   category?: WikiCategory;
@@ -35,6 +41,13 @@ export interface UseWikiFiltersResult {
   setFilter: <TKey extends keyof WikiFilters>(key: TKey, value: WikiFilters[TKey]) => void;
   reset: () => void;
   hasActiveFilters: boolean;
+  /**
+   * 当前打开的详情抽屉词条 id（`?wikiEntry=...`）。
+   * 它不是筛选条件，而是视图状态 —— 但同样放 URL 上：
+   * 攻略里的「关联词条」要能一键跳到影神图详情，分享出去的链接也该带着它。
+   */
+  selectedEntryId: string | null;
+  setSelectedEntryId: (entryId: string | null) => void;
 }
 
 function parseNumberParam<TValue extends number>(
@@ -116,6 +129,31 @@ export function useWikiFilters(): UseWikiFiltersResult {
     );
   }, [setSearchParams]);
 
+  const selectedEntryId = useMemo(() => {
+    const raw = searchParams.get(WIKI_ENTRY_PARAM_KEY);
+    return raw === null || raw.trim() === '' ? null : raw;
+  }, [searchParams]);
+
+  const setSelectedEntryId = useCallback(
+    (entryId: string | null) => {
+      setSearchParams(
+        (previous) => {
+          const next = new URLSearchParams(previous);
+
+          if (entryId === null || entryId.trim() === '') {
+            next.delete(WIKI_ENTRY_PARAM_KEY);
+          } else {
+            next.set(WIKI_ENTRY_PARAM_KEY, entryId);
+          }
+
+          return next;
+        },
+        { replace: true },
+      );
+    },
+    [setSearchParams],
+  );
+
   const query = useMemo<WikiQuery>(
     () => ({
       chapter: filters.chapter,
@@ -132,6 +170,8 @@ export function useWikiFilters(): UseWikiFiltersResult {
     query,
     setFilter,
     reset,
+    selectedEntryId,
+    setSelectedEntryId,
     hasActiveFilters:
       filters.chapter !== undefined ||
       filters.category !== undefined ||
