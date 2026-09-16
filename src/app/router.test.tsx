@@ -103,6 +103,22 @@ describe('路由表', () => {
     expect(screen.queryByText('演示后台')).not.toBeInTheDocument();
   });
 
+  it('场景「版主值班」的落点成立：版主身份访问 /admin 同样是 403（后台未交付）', async () => {
+    renderAt('/admin?demo=1&role=moderator');
+
+    expect(await screen.findByRole('heading', { name: /无资格入内/ })).toBeVisible();
+  });
+
+  it('他人主页未交付：/user/:userId 给出说明页，而不是展示自己的档案', async () => {
+    renderAt('/user/user-someone-else?demo=1&role=active');
+
+    expect(
+      await screen.findByRole('heading', { level: 1, name: /他人主页 · user-someone-else/ }),
+    ).toBeVisible();
+    // 不能把当前登录用户的成长中心当成别人的主页渲染出来
+    expect(screen.queryByLabelText(COPY.growth.profile.title)).not.toBeInTheDocument();
+  });
+
   it('未知路径渲染 404 页', async () => {
     renderAt('/not-a-real-page');
 
