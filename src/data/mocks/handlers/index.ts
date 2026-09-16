@@ -1,7 +1,9 @@
 import { demoHandlers } from '@/data/mocks/handlers/demo';
+import { authHandlers } from '@/data/mocks/handlers/auth';
+import { growthHandlers } from '@/data/mocks/handlers/growth';
 
 /**
  * 全部 mock handler 的注册表（协议：新 mock 必须注册进 browser.ts）。
- * 阶段 2 起每个业务模块在这里追加自己的 handler 数组。
+ * 浏览器与 Node 两端都从这里取，因此单测跑的链路与页面完全一致。
  */
-export const handlers = [...demoHandlers];
+export const handlers = [...demoHandlers, ...authHandlers, ...growthHandlers];

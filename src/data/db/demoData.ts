@@ -1,6 +1,8 @@
 import type { DemoProbe } from '@/data/contracts/demoProbe';
+import { clearGrowthTables, seedDemoGrowth } from '@/data/db/growthData';
 import { isDataInitialized, markDataInitialized } from '@/data/db/dataFlags';
 import { hmwDb } from '@/data/db/hmwDb';
+import { clearUserTable, ensureDemoUser } from '@/data/db/userData';
 import {
   BASELINE_PROBE_COUNT,
   FILLED_PROBE_COUNT,
@@ -37,29 +39,60 @@ export async function seedProbes(count: number, seed: number): Promise<number> {
   return probes.length;
 }
 
-/** 重置：回到基线数据量。 */
-export async function resetDemoData(seed: number): Promise<number> {
-  return seedProbes(BASELINE_PROBE_COUNT, seed);
+/**
+ * 重置：回到基线数据（探针 + 演示账号 + 成长数据）。
+ * 阶段 2 起，「重置」不再只清探针 —— 评审点它时期望的是回到一个完整可演示的初始状态。
+ */
+export async function resetDemoData(seed: number, now: Date = new Date()): Promise<number> {
+  const probeCount = await seedProbes(BASELINE_PROBE_COUNT, seed);
+  const user = await ensureDemoUser(now);
+  await clearGrowthTables();
+  await seedDemoGrowth(user.id, now);
+  return probeCount;
 }
 
 /** 填满：写入足量数据，用于验证长列表与后续虚拟滚动。 */
-export async function fillDemoData(seed: number): Promise<number> {
-  return seedProbes(FILLED_PROBE_COUNT, seed);
+export async function fillDemoData(seed: number, now: Date = new Date()): Promise<number> {
+  const probeCount = await seedProbes(FILLED_PROBE_COUNT, seed);
+  const user = await ensureDemoUser(now);
+  await seedDemoGrowth(user.id, now);
+  return probeCount;
 }
 
-/** 清空：本地库清表 + localStorage 按 hmw: 前缀清理（协议 1.7 的 resetAll 语义）。 */
+/** 清空：本地库全部清表 + localStorage 按 hmw: 前缀清理（协议 1.7 的 resetAll 语义）。 */
 export async function clearAllData(): Promise<{ clearedKeys: number }> {
-  await hmwDb.probes.clear();
+  await hmwDb.transaction(
+    'rw',
+    hmwDb.probes,
+    hmwDb.checkins,
+    hmwDb.tasks,
+    hmwDb.notifications,
+    async () => {
+      await hmwDb.probes.clear();
+      await hmwDb.checkins.clear();
+      await hmwDb.tasks.clear();
+      await hmwDb.notifications.clear();
+    },
+  );
+  await clearUserTable();
+
   const clearedKeys = clearHmwEntries(window.localStorage);
   markDataInitialized();
   return { clearedKeys };
 }
 
-/** 首次进入站点时播种基线数据；已初始化过则什么都不做。 */
-export async function ensureFirstRunSeed(seed: number): Promise<boolean> {
+/**
+ * 首次进入站点时播种基线数据；已初始化过则什么都不做。
+ * 演示账号与成长数据一并准备好，否则首访者进「我的」会看到一片空白，
+ * 分不清是「还没登录」还是「数据没种上」。
+ */
+export async function ensureFirstRunSeed(seed: number, now: Date = new Date()): Promise<boolean> {
   if (isDataInitialized()) {
     return false;
   }
+
   await seedProbes(BASELINE_PROBE_COUNT, seed);
+  const user = await ensureDemoUser(now);
+  await seedDemoGrowth(user.id, now);
   return true;
 }

@@ -4,3 +4,7 @@
  */
 export { demoProbeRepo } from '@/data/repositories/demoProbeRepo';
 export type { DemoProbeRepository } from '@/data/repositories/demoProbeRepo';
+export { authRepo } from '@/data/repositories/authRepo';
+export type { AuthRepository } from '@/data/repositories/authRepo';
+export { growthRepo } from '@/data/repositories/growthRepo';
+export type { GrowthRepository } from '@/data/repositories/growthRepo';

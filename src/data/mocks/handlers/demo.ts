@@ -1,12 +1,11 @@
 import { HttpResponse, http } from 'msw';
 
+import { API_PATHS } from '@/data/apiPaths';
 import type { Paginated } from '@/data/contracts/common';
 import type { DemoProbe } from '@/data/contracts/demoProbe';
 import { readAllProbes } from '@/data/db/demoData';
 import { hmwDb } from '@/data/db/hmwDb';
 import { mockDelay, mockError, toMockResponse } from '@/data/mocks/mockControl';
-
-export const DEMO_PROBES_PATH = '/api/demo/probes';
 
 /**
  * 演示探针接口（阶段 1 专用）。
@@ -14,7 +13,7 @@ export const DEMO_PROBES_PATH = '/api/demo/probes';
  * 演示控制台切到断网/错误态时，所有列表立刻统一失败。
  */
 export const demoHandlers = [
-  http.get(DEMO_PROBES_PATH, async () => {
+  http.get(API_PATHS.demoProbes, async () => {
     try {
       mockError();
       await mockDelay();
@@ -33,7 +32,7 @@ export const demoHandlers = [
     }
   }),
 
-  http.patch(`${DEMO_PROBES_PATH}/:id`, async ({ params }) => {
+  http.patch(API_PATHS.demoProbeToggle, async ({ params }) => {
     try {
       mockError();
       await mockDelay();
