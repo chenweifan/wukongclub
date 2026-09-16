@@ -1,6 +1,6 @@
 import { transferableAbortController } from 'node:util';
 
-import { cleanup } from '@testing-library/react';
+import { configure, cleanup } from '@testing-library/react';
 import { afterAll, afterEach, beforeAll } from 'vitest';
 
 import '@testing-library/jest-dom/vitest';
@@ -10,6 +10,14 @@ import { server } from '@/data/mocks/node';
 import { useDemoStore } from '@/demo/demoStore';
 import { resetRecorder } from '@/demo/recorder';
 import { useToastStore } from '@/stores/toastStore';
+
+/**
+ * findBy* 的默认等待是 1s。演示浮层（控制台/提示条）是 React.lazy 的，
+ * 在并行跑 20+ 个测试文件时，按需编译并求值这个 chunk 偶尔会超过 1s，
+ * 于是出现「单独跑通过、全量跑失败」的假阴性。放宽到 5s 消除这类抖动，
+ * 真正的失败依旧会明确报错（而不是超时掩盖）。
+ */
+configure({ asyncUtilTimeout: 5000 });
 
 /**
  * jsdom 会用自己的 AbortController / AbortSignal 覆盖全局，

@@ -24,6 +24,13 @@ function renderAt(path: string) {
   return { router, view };
 }
 
+/** 演示浮层是 React.lazy 的：断言「没有渲染」之前，先给它一个挂载窗口。 */
+async function waitForLazyOverlay(): Promise<void> {
+  await new Promise((resolve) => {
+    setTimeout(resolve, 80);
+  });
+}
+
 /**
  * 路由级集成测试：用 createMemoryRouter 复用真实路由表，
  * 覆盖「懒加载页面能挂载」「布局与守卫按预期生效」两条阶段 0 验收标准。
@@ -86,6 +93,12 @@ describe('路由表', () => {
     renderAt('/?demo=1&clean=1');
 
     expect(await screen.findByRole('heading', { level: 1, name: /粉丝互动站/ })).toBeVisible();
+
+    // 演示浮层是按需加载的：先等它有机会挂载，再断言「确实什么都没渲染」
+    await waitForLazyOverlay();
+
+    expect(useDemoStore.getState().enabled).toBe(true);
+    expect(useDemoStore.getState().clean).toBe(true);
     expect(screen.queryByText(/演示模式 · 数据为本地模拟/)).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: '打开演示控制台' })).not.toBeInTheDocument();
   });
