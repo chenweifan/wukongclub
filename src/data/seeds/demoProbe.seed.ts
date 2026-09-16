@@ -7,7 +7,7 @@ import type { DemoProbe } from '@/data/contracts/demoProbe';
  * 演示探针种子数据（协议 6.x：长尾数据用 faker 生成，但必须固定 seed 保证可复现）。
  *
  * 注意：这里的词条是**纯演示用词**，与任何真实游戏内容无关 ——
- * 真实影神图数据在阶段 2 的 data/seeds/encyclopedia.seed.ts 里交付。
+ * 真实影神图数据在 data/seeds/encyclopedia.seed.ts 里。
  */
 
 /** 基线数据量：首次进入与「重置」用。 */

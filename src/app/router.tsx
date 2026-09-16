@@ -78,7 +78,8 @@ export const routes: RouteObject[] = [
             lazy: () => lazyPage(() => import('@/pages/user/UserPage'), 'UserPage'),
           },
           {
-            // 他人主页：与自己主页复用同一页面组件，由页面内部读参数区分视角（阶段 2 实现）
+            // 他人主页（个人主页模块）：未交付，但路由保留 ——
+            // 直接删路由会让外部链接拿到 404，而这里给的是「未交付」说明页
             path: 'user/:userId',
             lazy: () => lazyPage(() => import('@/pages/user/UserPage'), 'UserPage'),
           },

@@ -116,10 +116,13 @@ describe('writeDemoStateToUrl', () => {
     expect(writeDemoStateToUrl('?demo=1&role=admin&ui=empty', DEFAULT_DEMO_STATE)).toBe('');
   });
 
-  it('保留第三方参数（阶段 3 的配装分享链接不能被吃掉）', () => {
-    const search = writeDemoStateToUrl('?build=abc123&from=share&demo=1&role=guest', fullState);
+  it('保留第三方参数（业务侧参数不能被演示回写吃掉）', () => {
+    const search = writeDemoStateToUrl(
+      '?wikiEntry=wiki-heixiongjing&from=share&demo=1&role=guest',
+      fullState,
+    );
 
-    expect(search).toContain('build=abc123');
+    expect(search).toContain('wikiEntry=wiki-heixiongjing');
     expect(search).toContain('from=share');
     expect(search).toContain('role=admin');
   });

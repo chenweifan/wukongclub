@@ -60,7 +60,7 @@ export interface User {
   avatarGlyph: string;
   bio: string;
   exp: number;
-  /** 灵蕴积分，用于阶段 3 的商城兑换。 */
+  /** 灵蕴积分：来自签到与任务，当前用于成长档案展示（商城模块未交付）。 */
   spiritPoints: number;
   joinedAt: string;
   badges: readonly UserBadge[];

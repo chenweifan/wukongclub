@@ -12,7 +12,7 @@ import { COPY } from '@/utils/copy';
 export const DEMO_PROBES_QUERY_KEY = ['demo', 'probes'] as const;
 
 /**
- * 演示探针自检面板（阶段 1 专用，阶段 2 起被真实业务列表取代）。
+ * 演示探针自检面板（演示系统的常驻自检面）。
  *
  * 它是协议 1.3 验收标准的「实物证据」：
  * - 走 Repository → MSW → IndexedDB 全链路，不 mock 掉任何一层；
