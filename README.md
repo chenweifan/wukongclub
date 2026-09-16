@@ -158,6 +158,32 @@ src/
   Repository → MSW → IndexedDB，可勾选（写操作持久化），也会被快照一起备份。
   阶段 2 起会被真实业务列表取代。
 
+## 组件文档（Storybook）
+
+```bash
+npm run storybook         # http://localhost:6006
+npm run build-storybook   # 静态站点输出到 storybook-static/（已 gitignore）
+```
+
+- **17 个组件 / 91 个 story**，与源码同目录（`Component.stories.tsx`），组件搬家时 story 跟着走。
+- 每个组件都覆盖它真正拥有的形态：`default` / `loading` / `empty` / `error` / 极端长文本；
+  没有这些形态的组件（例如纯展示的占位页）会在 story 文件头注明原因，而不是硬凑。
+- 工具栏可切三套主题：写的是 `demoStore.theme`，与页面内切换是同一个状态源。
+- 装饰器把 story 放进**与应用一致的上下文**：QueryClient、ThemeProvider、MemoryRouter、
+  演示状态、以及 MSW Mock 后端（`mockServiceWorker.js` 通过 `staticDirs` 提供）。
+  所以「演示探针面板」的 story 跑的是真实的 Repository → MSW → IndexedDB 链路，
+  而不是把数据塞成 props。
+- 用 `parameters.demo` 预置演示状态：
+
+  ```tsx
+  export const OfflineOverride: Story = {
+    args: { query: successQuery },
+    parameters: { demo: { state: { enabled: true, uiState: 'offline' } } },
+  };
+  ```
+
+- 已装 `@storybook/addon-a11y`：每个 story 都能在面板里查看对比度、语义与键盘问题。
+
 ## 进度
 
 | 阶段 | 内容                                                                                     | 状态      |
