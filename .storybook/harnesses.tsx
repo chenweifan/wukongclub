@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 
 import { seedDemoGrowth } from '@/data/db/growthData';
+import { clearWikiTables, seedWikiEntries } from '@/data/db/encyclopediaData';
 import { toPublicUser } from '@/data/db/records';
 import type { UserRecord } from '@/data/db/records';
 import { authRepo } from '@/data/repositories';
@@ -85,4 +86,35 @@ export function withDemoRole(
   role: 'guest' | 'newbie' | 'active' | 'moderator' | 'admin' | 'banned',
 ) {
   useDemoStore.setState({ enabled: true, role });
+}
+
+/**
+ * 百科数据准备：影神图词条是**内容数据**，与登录态无关，
+ * 因此这里只负责把词条种进本地库（清表后重种，保证 story 之间互不影响）。
+ */
+export function WikiHarness({ children }: { children: ReactNode }) {
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    void (async () => {
+      await clearWikiTables();
+      await seedWikiEntries();
+
+      if (!cancelled) {
+        setReady(true);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (!ready) {
+    return <p className="text-content-muted p-4 text-xs">{COPY.common.loading}</p>;
+  }
+
+  return <>{children}</>;
 }
