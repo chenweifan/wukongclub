@@ -2,6 +2,7 @@ import { demoHandlers } from '@/data/mocks/handlers/demo';
 import { authHandlers } from '@/data/mocks/handlers/auth';
 import { encyclopediaHandlers } from '@/data/mocks/handlers/encyclopedia';
 import { growthHandlers } from '@/data/mocks/handlers/growth';
+import { guideHandlers } from '@/data/mocks/handlers/guide';
 import { newsHandlers } from '@/data/mocks/handlers/news';
 
 /**
@@ -14,4 +15,5 @@ export const handlers = [
   ...growthHandlers,
   ...encyclopediaHandlers,
   ...newsHandlers,
+  ...guideHandlers,
 ];

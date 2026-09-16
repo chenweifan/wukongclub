@@ -1,4 +1,6 @@
 import type { NewsArticle, NewsQuery, NewsTag, NewsTagCount } from '@/data/contracts/news';
+import { countMaskedSubjects, resolveSpoilerVisibility } from '@/utils/spoiler';
+import type { SpoilerContext } from '@/utils/spoiler';
 
 /**
  * 资讯域的纯逻辑：查询、排序、标签统计、时间线分组、剧透可见性。
@@ -125,32 +127,16 @@ export function resolveDayKind(dateKey: string, now: Date = new Date()): NewsDay
   return dateKey === toLocalDateKey(yesterday.toISOString()) ? 'yesterday' : 'dated';
 }
 
-/* ── 剧透遮罩 ─────────────────────────────────────────────────────── */
+/* ── 剧透遮罩（委托给站级原语 utils/spoiler） ─────────────────────── */
 
-export interface SpoilerContext {
-  /** 全局剧透开关（演示状态 / 顶栏）。 */
-  spoilerVisible: boolean;
-  /** 用户在这一条上手动揭开过的 id 集合。 */
-  revealedIds: readonly string[];
-}
-
-export type NewsVisibility = 'full' | 'masked';
+export type { SpoilerContext, SpoilerVisibility as NewsVisibility } from '@/utils/spoiler';
 
 /**
  * 单条资讯的可见性。
- *
- * 为什么是「遮罩」而不是「隐藏」：资讯列表隐藏条目会让用户以为漏发了新闻，
- * 而遮罩既保住了信息完整性（知道有这条），又把内容挡在点击之后。
+ * 规则本身在 utils/spoiler（资讯 / 攻略 / 论坛共用），这里只保留资讯侧的语义化入口。
  */
-export function resolveNewsVisibility(
-  article: NewsArticle,
-  context: SpoilerContext,
-): NewsVisibility {
-  if (article.spoilerLevel === 0 || context.spoilerVisible) {
-    return 'full';
-  }
-
-  return context.revealedIds.includes(article.id) ? 'full' : 'masked';
+export function resolveNewsVisibility(article: NewsArticle, context: SpoilerContext) {
+  return resolveSpoilerVisibility(article, context);
 }
 
 /** 需要遮罩的条数（给筛选条上的提示用）。 */
@@ -158,5 +144,5 @@ export function countMaskedArticles(
   articles: readonly NewsArticle[],
   context: SpoilerContext,
 ): number {
-  return articles.filter((article) => resolveNewsVisibility(article, context) === 'masked').length;
+  return countMaskedSubjects(articles, context);
 }

@@ -35,6 +35,13 @@ export const API_PATHS = {
     tags: '/api/news/tags',
     article: '/api/news/:newsId',
   },
+  guide: {
+    list: '/api/guides',
+    counts: '/api/guides/counts',
+    likes: '/api/guides/likes',
+    detail: '/api/guides/:guideId',
+    like: '/api/guides/:guideId/like',
+  },
 } as const;
 
 /**

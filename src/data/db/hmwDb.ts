@@ -2,10 +2,17 @@ import Dexie from 'dexie';
 import type { Table } from 'dexie';
 
 import type { CheckInRecord } from '@/data/contracts/growth';
+import type { GuideArticle } from '@/data/contracts/guide';
 import type { NewsArticle } from '@/data/contracts/news';
 import type { WikiEntry } from '@/data/contracts/encyclopedia';
 import type { DemoProbe } from '@/data/contracts/demoProbe';
-import type { FavoriteRecord, NotificationRecord, TaskRecord, UserRecord } from '@/data/db/records';
+import type {
+  FavoriteRecord,
+  GuideLikeRecord,
+  NotificationRecord,
+  TaskRecord,
+  UserRecord,
+} from '@/data/db/records';
 
 export const HMW_DB_NAME = 'hmw-db';
 
@@ -34,6 +41,8 @@ export class HmwDatabase extends Dexie {
   declare readonly wikiEntries: Table<WikiEntry, string>;
   declare readonly favorites: Table<FavoriteRecord, string>;
   declare readonly newsArticles: Table<NewsArticle, string>;
+  declare readonly guideArticles: Table<GuideArticle, string>;
+  declare readonly guideLikes: Table<GuideLikeRecord, string>;
 
   constructor() {
     super(HMW_DB_NAME);
@@ -71,6 +80,20 @@ export class HmwDatabase extends Dexie {
       wikiEntries: 'id, category, chapter, rarity, name',
       favorites: 'id, ownerId, entryId, [ownerId+entryId]',
       newsArticles: 'id, category, publishedAt, pinned',
+    });
+
+    // v5：攻略库（攻略 + 点赞）。点赞与收藏同构。
+    this.version(5).stores({
+      probes: 'id, category, collected, createdAt',
+      users: 'id, &username',
+      checkins: 'id, userId, date, [userId+date]',
+      tasks: 'id, userId, kind, [userId+periodKey]',
+      notifications: 'id, userId, category, read, createdAt',
+      wikiEntries: 'id, category, chapter, rarity, name',
+      favorites: 'id, ownerId, entryId, [ownerId+entryId]',
+      newsArticles: 'id, category, publishedAt, pinned',
+      guideArticles: 'id, kind, difficulty, chapter, updatedAt, views',
+      guideLikes: 'id, ownerId, guideId, [ownerId+guideId]',
     });
   }
 }

@@ -12,3 +12,5 @@ export { encyclopediaRepo } from '@/data/repositories/encyclopediaRepo';
 export type { EncyclopediaRepository } from '@/data/repositories/encyclopediaRepo';
 export { newsRepo } from '@/data/repositories/newsRepo';
 export type { NewsRepository } from '@/data/repositories/newsRepo';
+export { guideRepo } from '@/data/repositories/guideRepo';
+export type { GuideRepository } from '@/data/repositories/guideRepo';

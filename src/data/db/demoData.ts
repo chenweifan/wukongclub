@@ -1,5 +1,6 @@
 import type { DemoProbe } from '@/data/contracts/demoProbe';
 import { clearWikiTables, seedWikiEntries } from '@/data/db/encyclopediaData';
+import { clearGuideTables, seedGuideArticles } from '@/data/db/guideData';
 import { clearNewsTable, seedNewsArticles } from '@/data/db/newsData';
 import { clearGrowthTables, seedDemoGrowth } from '@/data/db/growthData';
 import { isDataInitialized, markDataInitialized } from '@/data/db/dataFlags';
@@ -49,6 +50,7 @@ export async function resetDemoData(seed: number, now: Date = new Date()): Promi
   const probeCount = await seedProbes(BASELINE_PROBE_COUNT, seed);
   await seedWikiEntries();
   await seedNewsArticles(now);
+  await seedGuideArticles(now);
   const user = await ensureDemoUser(now);
   await clearGrowthTables();
   await seedDemoGrowth(user.id, now);
@@ -60,6 +62,7 @@ export async function fillDemoData(seed: number, now: Date = new Date()): Promis
   const probeCount = await seedProbes(FILLED_PROBE_COUNT, seed);
   await seedWikiEntries();
   await seedNewsArticles(now);
+  await seedGuideArticles(now);
   const user = await ensureDemoUser(now);
   await seedDemoGrowth(user.id, now);
   return probeCount;
@@ -85,6 +88,7 @@ export async function clearAllData(): Promise<{ clearedKeys: number }> {
   );
   await clearWikiTables();
   await clearNewsTable();
+  await clearGuideTables();
   await clearUserTable();
 
   const clearedKeys = clearHmwEntries(window.localStorage);
@@ -105,6 +109,7 @@ export async function ensureFirstRunSeed(seed: number, now: Date = new Date()): 
   await seedProbes(BASELINE_PROBE_COUNT, seed);
   await seedWikiEntries();
   await seedNewsArticles(now);
+  await seedGuideArticles(now);
   const user = await ensureDemoUser(now);
   await seedDemoGrowth(user.id, now);
   return true;

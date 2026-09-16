@@ -44,6 +44,14 @@ export interface FavoriteRecord {
   createdAt: string;
 }
 
+/** 攻略点赞记录：与收藏同构（ownerId 为 user:<id> 或 device:<id>）。 */
+export interface GuideLikeRecord {
+  id: string;
+  ownerId: string;
+  guideId: string;
+  createdAt: string;
+}
+
 /** 去掉密码摘要。少一个字段就少一条泄漏路径。 */
 export function toPublicUser(record: UserRecord): User {
   const { passwordDigest: _passwordDigest, ...user } = record;
