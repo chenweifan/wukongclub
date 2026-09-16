@@ -1,0 +1,81 @@
+/* =========================================================================
+   src/styles/demo.css
+   演示系统专属样式：提示条占位、组件边界、栅格，以及 driver.js 引导的主题化。
+   单独成文件是为了让 globals.css 保持「与演示无关的站点基线」。
+   ========================================================================= */
+
+/* 演示提示条固定占住顶部：body 让出等高内边距，sticky 头部则由
+   --hmw-banner-h 参与 top 计算（见 MainLayout）。 */
+body {
+  padding-top: var(--hmw-banner-h, 0px);
+}
+
+/* 组件边界模式（工具）：给所有元素描边，用令牌色，不改动任何组件代码 */
+[data-demo-outline='1'] * {
+  outline: 1px dashed var(--hmw-border-strong);
+  outline-offset: 1px;
+}
+
+/* =========================================================================
+   driver.js 引导主题化
+   driver 的样式表在引导启动时才动态加载，因此这里必须用 !important 才能稳定覆盖。
+   颜色一律走令牌，保证高对比主题下引导同样清晰。
+   ========================================================================= */
+.driver-overlay {
+  background-color: var(--hmw-overlay) !important;
+}
+
+.driver-popover.hmw-tour-popover {
+  background-color: var(--hmw-surface) !important;
+  color: var(--hmw-text) !important;
+  border: var(--hmw-border-w) solid var(--hmw-border-strong) !important;
+  border-radius: var(--radius-scroll) !important;
+  box-shadow: var(--shadow-seal) !important;
+  max-width: 22rem;
+}
+
+.hmw-tour-popover .driver-popover-title {
+  font-family: var(--font-display) !important;
+  font-size: 15px !important;
+  color: var(--hmw-text) !important;
+}
+
+.hmw-tour-popover .driver-popover-description {
+  font-family: var(--font-body) !important;
+  font-size: 13px !important;
+  line-height: 1.7 !important;
+  color: var(--hmw-text-muted) !important;
+}
+
+.hmw-tour-popover .driver-popover-progress-text {
+  color: var(--hmw-accent) !important;
+  font-size: 11px !important;
+}
+
+.hmw-tour-popover button {
+  background-color: var(--hmw-accent) !important;
+  color: var(--hmw-accent-ink) !important;
+  border: none !important;
+  border-radius: var(--radius-scroll) !important;
+  text-shadow: none !important;
+  font-size: 12px !important;
+}
+
+.hmw-tour-popover .driver-popover-close-btn {
+  background-color: transparent !important;
+  color: var(--hmw-text-muted) !important;
+}
+
+/* 小箭头也要跟着换色，否则会出现「深色气泡 + 浅色箭头」的割裂 */
+.hmw-tour-popover .driver-popover-arrow-side-left.driver-popover-arrow {
+  border-left-color: var(--hmw-surface) !important;
+}
+.hmw-tour-popover .driver-popover-arrow-side-right.driver-popover-arrow {
+  border-right-color: var(--hmw-surface) !important;
+}
+.hmw-tour-popover .driver-popover-arrow-side-top.driver-popover-arrow {
+  border-top-color: var(--hmw-surface) !important;
+}
+.hmw-tour-popover .driver-popover-arrow-side-bottom.driver-popover-arrow {
+  border-bottom-color: var(--hmw-surface) !important;
+}
