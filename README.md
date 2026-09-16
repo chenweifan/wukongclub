@@ -9,6 +9,27 @@
 
 ---
 
+## 交付状态（先看这一段）
+
+**本次交付范围**：阶段 0 骨架 + 阶段 1 DEMO 演示系统 + 阶段 2 的四个业务模块
+（用户成长与登录、影神图百科、资讯、攻略库）。
+
+**未包含**：阶段 2 剩余的论坛与个人主页，以及阶段 3 的全部模块
+（配装模拟器、互动地图、收集追踪、二创、活动、灵蕴商城、后台）。
+这些入口**保留在导航里并标着「未交付」**，点进去是一个说明页（讲清原计划做什么、
+现在能去哪里），而不是坏链接或空白页 —— 站点不会承诺它没有的东西。
+
+**一条命令验收**（格式 + 类型 + Lint + 单测 + 构建 + 产物冒烟）：
+
+```bash
+npm install
+npm run verify
+```
+
+详细的交付清单、验收步骤与已知限制见 [`docs/DELIVERY.md`](docs/DELIVERY.md)。
+
+---
+
 ## 快速开始
 
 ```bash
@@ -16,27 +37,32 @@ npm install
 npm run dev          # http://127.0.0.1:5173
 ```
 
-| 脚本                | 说明                         |
-| ------------------- | ---------------------------- |
-| `npm run dev`       | 启动开发服务器               |
-| `npm run build`     | 类型检查 + 生产构建          |
-| `npm run typecheck` | 仅类型检查（`tsc --noEmit`） |
-| `npm run lint`      | ESLint（0 warning 容忍）     |
-| `npm run format`    | Prettier 格式化              |
-| `npm test`          | Vitest 单测 + 路由集成测试   |
+| 脚本                      | 说明                                              |
+| ------------------------- | ------------------------------------------------- |
+| `npm run dev`             | 启动开发服务器                                    |
+| `npm run verify`          | 交付验收：格式 → 类型 → Lint → 测试 → 构建 → 冒烟 |
+| `npm run build`           | 类型检查 + 生产构建                               |
+| `npm run smoke`           | 用 `vite preview` 伺服产物并逐个探测路由          |
+| `npm run typecheck`       | 仅类型检查（`tsc --noEmit`）                      |
+| `npm run lint`            | ESLint（0 warning 容忍）                          |
+| `npm run format`          | Prettier 格式化（`format:check` 只校验）          |
+| `npm test`                | Vitest 单测 + 路由集成测试                        |
+| `npm run storybook`       | 组件文档（http://localhost:6006）                 |
+| `npm run build-storybook` | 静态 Storybook 输出到 `storybook-static/`         |
 
 ## 技术栈（协议锁定）
 
 Vite · React 18 · TypeScript(strict) · react-router-dom v6 Data Router ·
 @tanstack/react-query · zustand(persist) · Tailwind CSS + CSS 变量令牌 ·
-Radix 无样式原语 · framer-motion · TipTap · react-virtual · ECharts · dnd-kit ·
-MSW + faker · Dexie · lz-string · html-to-image · driver.js · Vitest + Playwright · Storybook
+Radix 无样式原语 · framer-motion · react-virtual · ECharts ·
+MSW + faker · Dexie · driver.js · Vitest · Storybook
 
-> 依赖按阶段推进逐步引入。**阶段 1 已引入**：msw、@faker-js/faker、dexie、
-> framer-motion、driver.js、@radix-ui/react-dialog、@radix-ui/react-switch，
-> 以及开发期的 fake-indexeddb（jsdom 没有 IndexedDB，Dexie 与 MSW 链路需要它才能测）。
-> 阶段 2/3 会继续引入 TipTap、react-virtual、ECharts、dnd-kit、lz-string、html-to-image，
-> 全部来自协议清单，不新增清单外依赖。
+> 实际引入的依赖全部来自协议清单，没有清单外新增：
+> 阶段 1 引入 msw、@faker-js/faker、dexie、framer-motion、driver.js、Radix dialog/switch
+> 与开发期 fake-indexeddb（jsdom 没有 IndexedDB）；阶段 2 引入 @tanstack/react-virtual
+> 与 echarts/echarts-for-react（影神图卡片墙与关联图谱）。
+> **未引入**的清单内依赖：TipTap、dnd-kit、lz-string、html-to-image、Playwright ——
+> 它们服务的是未交付模块与浏览器 E2E，见 `docs/DELIVERY.md` 的「未包含」一节。
 
 ## 目录结构
 
@@ -119,15 +145,18 @@ src/
 
 ### 预设场景
 
-| id              | 名称       | 说明                                       |
-| --------------- | ---------- | ------------------------------------------ |
-| `first-visit`   | 首次到访   | 基线数据 + 跨页引导                        |
-| `spoiler-free`  | 零剧透浏览 | 剧透全关、宣纸主题，适合分享给未通关的朋友 |
-| `build-master`  | 配装大师   | 直奔配装模拟器 + 满量数据                  |
-| `moderate-flow` | 版主值班   | 版主身份进论坛，预演审核动线               |
-| `empty-launch`  | 空数据首启 | 清空全部本地数据，检查空态                 |
-| `chaos`         | 混沌故障   | 断网 + 封禁 + 高对比 + 栅格，压满异常态    |
-| `event-season`  | 赛季活动   | 活动中心 + 满量数据                        |
+| id              | 名称       | 落点与说明                                                |
+| --------------- | ---------- | --------------------------------------------------------- |
+| `first-visit`   | 首次到访   | 基线数据 + 八步跨页引导，从 `/` 出发                      |
+| `spoiler-free`  | 零剧透浏览 | 剧透全关、宣纸主题，落点 `/guide`，适合发给未通关的朋友   |
+| `build-master`  | 配装大师   | 满量数据（词条 / 资讯 / 攻略）压测长列表，落点 `/wiki`    |
+| `moderate-flow` | 版主值班   | 版主身份访问 `/admin`：演示角色守卫渲染 403（后台未交付） |
+| `empty-launch`  | 空数据首启 | 清空全部本地数据，检查空态，落点 `/`                      |
+| `chaos`         | 混沌故障   | 断网 + 封禁 + 高对比 + 栅格，压满异常态，落点 `/`         |
+| `event-season`  | 赛季活动   | 满量数据下的资讯时间线，落点 `/news`（活动中心未交付）    |
+
+> 剩余模块终止开发后，场景落点做过一次对齐：**除 `moderate-flow`（刻意演示 403）之外，
+> 每个场景都落在已交付页面**，测试守着这条约定。
 
 场景切换 = 应用状态 patch + 可选重置种子数据 + 跳转路由 + 可选启动引导。
 链接复现的是**状态**；要连数据一起复现，请用快照导入导出（两者互补）。
@@ -138,7 +167,9 @@ src/
 - `console-guide`：控制台六个分区逐个讲解（启动时自动展开控制台）。
 
 键盘 `←` `→` 翻页、`Esc` 退出；步骤只写路由与选择器，文案集中在
-`src/demo/fixtures/tourCopy.ts`。单测会校验每个 `data-tour` 锚点在源码里真实存在。
+`src/demo/fixtures/tourCopy.ts`。两道测试守着它不会静默失效：
+单测校验每个 `data-tour` 锚点在源码里真实存在，路由级测试再确认**跨页步骤的目标
+在被跳转的那个页面上确实渲染出来**（占位页被真实页面取代时就踩过这个坑）。
 
 ### 数据快照
 
@@ -165,7 +196,7 @@ npm run storybook         # http://localhost:6006
 npm run build-storybook   # 静态站点输出到 storybook-static/（已 gitignore）
 ```
 
-- **42 个组件 / 202 个 story**，与源码同目录（`Component.stories.tsx`），组件搬家时 story 跟着走。
+- **42 个组件 / 204 个 story**，与源码同目录（`Component.stories.tsx`），组件搬家时 story 跟着走。
 - 每个组件都覆盖它真正拥有的形态：`default` / `loading` / `empty` / `error` / 极端长文本；
   没有这些形态的组件（例如纯展示的占位页）会在 story 文件头注明原因，而不是硬凑。
 - 工具栏可切三套主题：写的是 `demoStore.theme`，与页面内切换是同一个状态源。
@@ -387,10 +418,21 @@ npm run build-storybook   # 静态站点输出到 storybook-static/（已 gitign
 
 ## 进度
 
-| 阶段 | 内容                                                                                     | 状态             |
-| ---- | ---------------------------------------------------------------------------------------- | ---------------- |
-| 0    | 项目骨架（工程配置 / 目录 / 令牌三主题 / Providers / 路由守卫 / 三布局 / 占位页 / Home） | ✅ 已交付        |
-| 1    | DEMO 演示系统（URL 双向同步 / StateBoundary / 葫芦控制台 / 7 场景 / 引导 / 快照 / 录制） | ✅ 已交付        |
-| 2    | 核心业务：**用户成长 ✅** → **影神图 ✅** → **资讯 ✅** → **攻略 ✅** → 论坛 → 个人主页  | 🚧 进行中（4/6） |
-| 3    | 高级功能：配装模拟器 → 互动地图 → 收集追踪 → 二创 → 活动 → 灵蕴商城 → 后台               | 未开始           |
-| 4    | 审查 / 重构 / E2E / 性能 / 交付文档                                                      | 未开始           |
+> 剩余业务模块已**终止开发**（论坛、个人主页，以及阶段 3 全部模块）。
+> 阶段 4 的收尾工作按「可交付」标准完成：诚实化占位与导航、验收脚本、交付文档、
+> 全链路复验。未包含的部分逐条列在 [`docs/DELIVERY.md`](docs/DELIVERY.md)。
+
+| 阶段 | 内容                                                                                          | 状态                       |
+| ---- | --------------------------------------------------------------------------------------------- | -------------------------- |
+| 0    | 项目骨架（工程配置 / 目录 / 令牌三主题 / Providers / 路由守卫 / 三布局 / 占位页 / Home）      | ✅ 已交付                  |
+| 1    | DEMO 演示系统（URL 双向同步 / StateBoundary / 葫芦控制台 / 7 场景 / 引导 / 快照 / 录制）      | ✅ 已交付                  |
+| 2    | 核心业务：**用户成长 ✅** → **影神图 ✅** → **资讯 ✅** → **攻略 ✅** → 论坛 ⛔ → 个人主页 ⛔ | ⏹ 止于 4/6（剩余模块终止） |
+| 3    | 高级功能：配装模拟器 → 互动地图 → 收集追踪 → 二创 → 活动 → 灵蕴商城 → 后台                    | ⛔ 未开展                  |
+| 4    | 审查 / 重构 / 性能 / 交付文档                                                                 | ✅ 已收尾（E2E 见说明）    |
+
+阶段 4 的取舍（一句话版）：
+
+- **有**：全链路复验（`npm run verify`：格式 / 类型 / Lint / 测试 / 构建 / 冒烟）、
+  未交付模块的诚实降级、交付文档与演示走查路径；
+- **没有**：浏览器级 E2E（Playwright 未安装 —— 未交付模块的交互路径本就没有，
+  已交付路径由路由集成测试 + 产物冒烟覆盖，见 `docs/DELIVERY.md`）。
