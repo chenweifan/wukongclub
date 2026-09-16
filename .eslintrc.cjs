@@ -45,4 +45,13 @@ module.exports = {
     eqeqeq: ['error', 'always'],
     'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
   },
+  overrides: [
+    {
+      // Storybook 的 CSF 文件必然同时导出 meta 与若干 story，不适用组件文件约束
+      files: ['**/*.stories.tsx', '.storybook/**/*.tsx'],
+      rules: {
+        'react-refresh/only-export-components': 'off',
+      },
+    },
+  ],
 };
