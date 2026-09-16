@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { DEMO_SCENARIO_IDS, DEMO_SCENARIOS, findDemoScenario } from '@/demo/scenarios/index';
 import { DEMO_STATE_KEYS } from '@/demo/types';
 import { DEMO_TOURS } from '@/demo/tours';
+import { isDeliveredRoute } from '@/app/navigation';
 import { routes } from '@/app/router';
 import type { RouteObject } from 'react-router-dom';
 
@@ -22,10 +23,19 @@ function collectPaths(routeObjects: readonly RouteObject[]): string[] {
   return paths;
 }
 
-const routePaths = collectPaths(routes);
+/**
+ * 路由表里既有相对 path（'wiki'）也有绝对 path（'/admin'），
+ * 因此两侧都要归一化再比较 —— 否则绝对路径会被误判成「不存在」。
+ */
+function normalizePath(path: string): string {
+  return path === '/' ? '/' : path.replace(/^\//, '');
+}
+
+const routePaths = collectPaths(routes).map(normalizePath);
 
 function isKnownRoute(path: string): boolean {
-  return path === '/' || routePaths.includes(path.replace(/^\//, ''));
+  const normalized = normalizePath(path);
+  return normalized === '/' || routePaths.includes(normalized);
 }
 
 describe('预设场景', () => {
@@ -66,6 +76,23 @@ describe('预设场景', () => {
   it('route 必须指向真实存在的路由', () => {
     for (const scenario of DEMO_SCENARIOS) {
       expect(isKnownRoute(scenario.route), `场景 ${scenario.id} 指向了不存在的路由`).toBe(true);
+    }
+  });
+
+  it('场景落点要么是已交付模块，要么是刻意演示守卫/占位的页面', () => {
+    // 剩余模块已终止开发：场景不该把评审丢到一个「什么都做不了」的占位页上。
+    // 唯一例外是后台 —— 那个场景演示的正是角色守卫（403），已写在场景描述里。
+    const intentionallyNotDelivered = new Set(['/admin']);
+
+    for (const scenario of DEMO_SCENARIOS) {
+      if (intentionallyNotDelivered.has(scenario.route)) {
+        continue;
+      }
+
+      expect(
+        isDeliveredRoute(scenario.route),
+        `场景 ${scenario.id} 落在未交付的 ${scenario.route}`,
+      ).toBe(true);
     }
   });
 

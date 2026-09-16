@@ -24,7 +24,9 @@ function collectPaths(routeObjects: readonly RouteObject[]): string[] {
   return paths;
 }
 
-const routePaths = collectPaths(routes);
+const routePaths = collectPaths(routes).map((path) =>
+  path === '/' ? '/' : path.replace(/^\//, ''),
+);
 
 /** 把 src 下所有 tsx 源码拼起来：用于核对 data-tour 锚点是否真的存在。 */
 function readSourceBundle(): string {

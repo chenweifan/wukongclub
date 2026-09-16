@@ -72,7 +72,8 @@ export const DEMO_SCENARIOS: readonly DemoScenario[] = [
   {
     id: 'build-master',
     name: '配装大师',
-    description: '直奔配装模拟器，并预置满量数据（页面本身在阶段 3 交付，URL 与状态现在就正确）。',
+    description:
+      '满量数据压测：48 条词条 / 28 条资讯 / 16 篇攻略，用来验证长列表与虚拟滚动（配装模拟器未在本次交付范围内）。',
     patch: {
       role: 'active',
       uiState: 'normal',
@@ -82,7 +83,7 @@ export const DEMO_SCENARIOS: readonly DemoScenario[] = [
       grid: false,
       seed: 2024,
     },
-    route: '/build-lab',
+    route: '/wiki',
     seedData: async () => {
       await fillDemoData(2024);
     },
@@ -90,7 +91,8 @@ export const DEMO_SCENARIOS: readonly DemoScenario[] = [
   {
     id: 'moderate-flow',
     name: '版主值班',
-    description: '版主身份进论坛，预演审核动线（论坛在阶段 2、后台在阶段 3 交付后自动生效）。',
+    description:
+      '版主身份直接访问后台：应当看到 403 权限页（后台模块未交付，这里演示的是角色守卫）。',
     patch: {
       role: 'moderator',
       uiState: 'normal',
@@ -100,7 +102,7 @@ export const DEMO_SCENARIOS: readonly DemoScenario[] = [
       grid: false,
       seed: 42,
     },
-    route: '/forum',
+    route: '/admin',
   },
   {
     id: 'empty-launch',
@@ -138,7 +140,7 @@ export const DEMO_SCENARIOS: readonly DemoScenario[] = [
   {
     id: 'event-season',
     name: '赛季活动',
-    description: '活动中心 + 满量数据，展示赛季与榜单场景（活动中心阶段 3 交付）。',
+    description: '满量数据下的资讯时间线，可按赛季相关标签筛选（活动中心未在本次交付范围内）。',
     patch: {
       role: 'active',
       uiState: 'normal',
@@ -148,7 +150,7 @@ export const DEMO_SCENARIOS: readonly DemoScenario[] = [
       grid: false,
       seed: 777,
     },
-    route: '/event',
+    route: '/news',
     seedData: async () => {
       await fillDemoData(777);
     },

@@ -126,38 +126,42 @@ export function WikiPage() {
         onOpen={setSelectedEntryId}
       />
 
-      <StateBoundary
-        query={listQuery}
-        label={COPY.wiki.title}
-        isEmpty={(data) => data.items.length === 0}
-        emptyTitle={COPY.wiki.empty}
-        emptyDescription={COPY.wiki.emptyHint}
-        emptyAction={
-          hasActiveFilters ? (
-            <button
-              type="button"
-              onClick={reset}
-              className="border-token border-line hover:text-accent mt-4 rounded-scroll border px-3 py-1.5 text-xs"
-            >
-              {COPY.wiki.resetFilters}
-            </button>
-          ) : null
-        }
-      >
-        {(data) => (
-          <WikiCardWall
-            entries={data.items}
-            searchTerm={filters.search}
-            favoriteIds={favoriteIds}
-            compareIds={compareIds}
-            compareFull={compareFull}
-            favoritePendingId={favoritePendingId}
-            onOpen={setSelectedEntryId}
-            onToggleFavorite={handleToggleFavorite}
-            onToggleCompare={handleToggleCompare}
-          />
-        )}
-      </StateBoundary>
+      {/* 引导剧本的跨页目标锚点：它必须在空态 / 错误态下也存在，
+          否则「自动跨页」那一步会跳过来却高亮不到任何东西 */}
+      <div data-tour="wiki-wall">
+        <StateBoundary
+          query={listQuery}
+          label={COPY.wiki.title}
+          isEmpty={(data) => data.items.length === 0}
+          emptyTitle={COPY.wiki.empty}
+          emptyDescription={COPY.wiki.emptyHint}
+          emptyAction={
+            hasActiveFilters ? (
+              <button
+                type="button"
+                onClick={reset}
+                className="border-token border-line hover:text-accent mt-4 rounded-scroll border px-3 py-1.5 text-xs"
+              >
+                {COPY.wiki.resetFilters}
+              </button>
+            ) : null
+          }
+        >
+          {(data) => (
+            <WikiCardWall
+              entries={data.items}
+              searchTerm={filters.search}
+              favoriteIds={favoriteIds}
+              compareIds={compareIds}
+              compareFull={compareFull}
+              favoritePendingId={favoritePendingId}
+              onOpen={setSelectedEntryId}
+              onToggleFavorite={handleToggleFavorite}
+              onToggleCompare={handleToggleCompare}
+            />
+          )}
+        </StateBoundary>
+      </div>
 
       <WikiEntryDrawer
         entryId={selectedEntryId}
