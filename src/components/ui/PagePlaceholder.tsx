@@ -19,7 +19,10 @@ export function PagePlaceholder({
   description = COPY.placeholder.hint,
 }: PagePlaceholderProps) {
   return (
-    <section className="panel-scroll texture-grain mx-auto max-w-page p-8">
+    <section
+      data-tour="page-placeholder"
+      className="panel-scroll texture-grain mx-auto max-w-page p-8"
+    >
       <p className="stamp inline-block">{phase}</p>
       <h1 className="mt-4 text-2xl md:text-3xl">{COPY.placeholder.default(pageName)}</h1>
       <p className="mt-3 max-w-2xl text-sm text-content-muted">{description}</p>

@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
 import { ForbiddenPage } from '@/pages/forbidden/ForbiddenPage';
-import { useDemo } from '@/demo/demoContext';
+import { useDemo } from '@/demo/useDemo';
 import type { DemoRole } from '@/demo/types';
 
 export interface RequireRoleProps {

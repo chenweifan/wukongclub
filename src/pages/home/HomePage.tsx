@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 
+import { DemoProbePanel } from '@/demo/panels/DemoProbePanel';
 import { COPY } from '@/utils/copy';
 
 interface ModuleCard {
@@ -72,7 +73,7 @@ export function HomePage() {
         </div>
       </section>
 
-      <section aria-labelledby="home-modules" className="space-y-4">
+      <section data-tour="home-modules" aria-labelledby="home-modules" className="space-y-4">
         <h2 id="home-modules" className="text-lg">
           模块导航
         </h2>
@@ -100,13 +101,11 @@ export function HomePage() {
         </ul>
       </section>
 
-      <section aria-labelledby="home-tokens" className="panel-scroll p-6">
+      <section data-tour="home-tokens" aria-labelledby="home-tokens" className="panel-scroll p-6">
         <h2 id="home-tokens" className="text-lg">
           {COPY.common.tokenCheck}
         </h2>
-        <p className="mt-2 text-xs text-content-muted">
-          色块均绑定 CSS 变量令牌（tokens.css）；切换右上角主题时整组应同步变化，无任何硬编码色值。
-        </p>
+        <p className="mt-2 text-xs text-content-muted">{COPY.common.tokenCheckHint}</p>
         <ul className="mt-4 flex flex-wrap gap-3">
           {TOKEN_SWATCHES.map((swatch) => (
             <li key={swatch.label} className="flex items-center gap-2">
@@ -119,6 +118,9 @@ export function HomePage() {
           ))}
         </ul>
       </section>
+
+      {/* 演示系统自检面板：阶段 1 的验收实物，阶段 2 起被真实业务列表取代 */}
+      <DemoProbePanel />
     </div>
   );
 }

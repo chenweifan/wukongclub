@@ -43,6 +43,16 @@
   --hmw-nav-h: 64px;
   --hmw-sidebar-w: 232px;
   --hmw-sidebar-w-collapsed: 72px;
+  /* 演示模式顶部提示条高度：默认 0，演示模式开启时由 DemoOverlay 写入 */
+  --hmw-banner-h: 0px;
+
+  /* ===== 层级：集中定义，避免各处 z-index 魔数互相压盖 ===== */
+  --hmw-z-banner: 55;
+  --hmw-z-grid: 58;
+  --hmw-z-console: 62;
+  --hmw-z-modal: 70;
+  --hmw-z-toast: 75;
+  --hmw-z-tour: 80;
 
   /* ===== 动效：尊重 prefers-reduced-motion（见 globals.css） ===== */
   --hmw-duration-fast: 120ms;

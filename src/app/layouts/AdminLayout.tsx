@@ -3,7 +3,7 @@ import { Link, Outlet } from 'react-router-dom';
 import { ADMIN_PLANNED_SECTIONS } from '@/app/navigation';
 import { UnofficialDisclaimer } from '@/components/business/UnofficialDisclaimer';
 import { ThemeSwitcher } from '@/components/ui/ThemeSwitcher';
-import { useDemo } from '@/demo/demoContext';
+import { useDemo } from '@/demo/useDemo';
 import { COPY } from '@/utils/copy';
 
 /**
@@ -41,7 +41,7 @@ export function AdminLayout() {
             {ADMIN_PLANNED_SECTIONS.map((section) => (
               <li
                 key={section.label}
-                className="border-token border-line bg-surface/50 rounded-scroll flex items-start gap-3 border p-3"
+                className="border-token border-line bg-surface rounded-scroll flex items-start gap-3 border p-3"
               >
                 <span
                   aria-hidden="true"

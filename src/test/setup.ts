@@ -1,9 +1,15 @@
 import { transferableAbortController } from 'node:util';
 
 import { cleanup } from '@testing-library/react';
-import { afterEach } from 'vitest';
+import { afterAll, afterEach, beforeAll } from 'vitest';
 
 import '@testing-library/jest-dom/vitest';
+import 'fake-indexeddb/auto';
+
+import { server } from '@/data/mocks/node';
+import { useDemoStore } from '@/demo/demoStore';
+import { resetRecorder } from '@/demo/recorder';
+import { useToastStore } from '@/stores/toastStore';
 
 /**
  * jsdom 会用自己的 AbortController / AbortSignal 覆盖全局，
@@ -35,7 +41,26 @@ if (isAbortSignalConstructor(nativeSignalConstructor)) {
   globalThis.AbortSignal = nativeSignalConstructor;
 }
 
-// jsdom 不会自动卸载组件；显式 cleanup 可避免用例之间通过 DOM 互相污染。
+/**
+ * 全局起 MSW Node server：与浏览器端复用同一份 handler。
+ * 于是「Repository → MSW → Dexie」在单测里是真实链路，
+ * 配合 fake-indexeddb（jsdom 没有 IndexedDB）就能完整跑通读写。
+ */
+beforeAll(() => {
+  server.listen({ onUnhandledRequest: 'error' });
+});
+
 afterEach(() => {
+  server.resetHandlers();
   cleanup();
+  // 演示状态与提示是模块级 store，不隔离会让用例互相污染
+  useDemoStore.getState().reset();
+  useToastStore.getState().clear();
+  resetRecorder();
+  window.localStorage.clear();
+  window.history.replaceState(null, '', '/');
+});
+
+afterAll(() => {
+  server.close();
 });

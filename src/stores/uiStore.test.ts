@@ -5,13 +5,11 @@ import { UI_STORAGE_KEY, useUiStore } from '@/stores/uiStore';
 describe('uiStore', () => {
   beforeEach(() => {
     window.localStorage.clear();
-    useUiStore.setState({ sidebarCollapsed: false, spoilerVisible: false });
+    useUiStore.setState({ sidebarCollapsed: false });
   });
 
-  it('默认状态：侧栏展开、剧透隐藏', () => {
-    const state = useUiStore.getState();
-    expect(state.sidebarCollapsed).toBe(false);
-    expect(state.spoilerVisible).toBe(false);
+  it('默认状态：侧栏展开', () => {
+    expect(useUiStore.getState().sidebarCollapsed).toBe(false);
   });
 
   it('toggleSidebar 在两次调用间来回切换', () => {
@@ -26,11 +24,6 @@ describe('uiStore', () => {
     useUiStore.getState().setSidebarCollapsed(true);
     useUiStore.getState().setSidebarCollapsed(true);
     expect(useUiStore.getState().sidebarCollapsed).toBe(true);
-  });
-
-  it('toggleSpoiler 切换剧透占位开关', () => {
-    useUiStore.getState().toggleSpoiler();
-    expect(useUiStore.getState().spoilerVisible).toBe(true);
   });
 
   it('写操作持久化到 localStorage，且键名带 hmw: 前缀', () => {
@@ -52,5 +45,9 @@ describe('uiStore', () => {
     expect(window.localStorage.getItem(UI_STORAGE_KEY)).toContain(
       `"sidebarCollapsed":${String(expected)}`,
     );
+  });
+
+  it('剧透开关已迁出本 store：状态源唯一是 DemoState.spoiler', () => {
+    expect(Object.keys(useUiStore.getState())).not.toContain('spoilerVisible');
   });
 });

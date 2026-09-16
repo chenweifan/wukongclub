@@ -1,5 +1,5 @@
+import { useThemeControl } from '@/app/useThemeControl';
 import { THEMES } from '@/app/theme';
-import { useThemeControl } from '@/app/themeContext';
 import { cn } from '@/utils/cn';
 import { COPY } from '@/utils/copy';
 
@@ -16,7 +16,7 @@ export function ThemeSwitcher() {
     <div
       role="group"
       aria-label={COPY.layout.themeLabel}
-      className="border-token border-line bg-surface/60 inline-flex items-center gap-1 rounded-scroll p-1"
+      className="border-token border-line bg-surface inline-flex items-center gap-1 rounded-scroll p-1"
     >
       {THEMES.map((candidate) => {
         const selected = candidate === theme;

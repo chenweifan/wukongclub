@@ -1,36 +1,29 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect } from 'react';
 
 import type { ReactNode } from 'react';
 
-import { ThemeContext } from '@/app/themeContext';
-import type { ThemeContextValue } from '@/app/themeContext';
-import { applyThemeAttribute, readStoredTheme, writeStoredTheme } from '@/app/theme';
+import { applyThemeAttribute, writeStoredTheme } from '@/app/theme';
+import { useDemoStore } from '@/demo/demoStore';
 
 export interface ThemeProviderProps {
   children: ReactNode;
-  /** 便于测试注入初始主题；不传则读取 localStorage。 */
-  initialTheme?: ThemeContextValue['theme'];
 }
 
 /**
- * 主题 Provider：状态源是 <html data-theme>（协议第七节），
- * React 侧只保存一份镜像以保证控件选中态同步。
+ * 主题副作用宿主。
+ *
+ * 阶段 1 起，主题的**唯一状态源**是 demoStore.theme（协议把 theme 归入 DemoState）：
+ * 顶栏切换器与控制台主题分区都写同一个字段，本组件只负责把它同步到
+ * <html data-theme> 与 localStorage（hmw:theme）。
+ * 这样就不会出现「控制台改了主题、顶栏没跟着变」这类双真相问题。
  */
-export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
-  const [theme, setThemeState] = useState<ThemeContextValue['theme']>(
-    () => initialTheme ?? readStoredTheme(),
-  );
+export function ThemeProvider({ children }: ThemeProviderProps) {
+  const theme = useDemoStore((state) => state.theme);
 
   useEffect(() => {
     applyThemeAttribute(theme);
     writeStoredTheme(theme);
   }, [theme]);
 
-  const setTheme = useCallback((next: ThemeContextValue['theme']) => {
-    setThemeState(next);
-  }, []);
-
-  const value = useMemo<ThemeContextValue>(() => ({ theme, setTheme }), [theme, setTheme]);
-
-  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
+  return <>{children}</>;
 }
