@@ -1,0 +1,25 @@
+# 依赖与构建产物
+node_modules/
+dist/
+dist-ssr/
+coverage/
+storybook-static/
+playwright-report/
+test-results/
+
+# 缓存
+.vite/
+*.tsbuildinfo
+.eslintcache
+
+# 本地环境
+.env
+.env.*
+!.env.example
+
+# 编辑器与系统
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db

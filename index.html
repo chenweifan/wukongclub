@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="ink">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>黑神话悟空 · 非官方粉丝互动站</title>
+    <meta
+      name="description"
+      content="黑神话悟空非官方粉丝互动站：影神图百科、配装模拟器、互动地图与天命人论坛。纯前端演示项目，全部数据为本地模拟。"
+    />
+    <meta name="theme-color" content="#0B0B0D" />
+    <script>
+      // 首屏防主题闪烁：必须在 React 挂载前把用户已选主题写到 <html data-theme>。
+      // 键名与取值校验需与 src/app/theme.ts 保持一致（此处无法 import，否则就失去防闪烁意义）。
+      (function () {
+        try {
+          var theme = window.localStorage.getItem('hmw:theme');
+          if (theme === 'ink' || theme === 'paper' || theme === 'contrast') {
+            document.documentElement.setAttribute('data-theme', theme);
+          }
+        } catch (error) {
+          // 隐私模式下 localStorage 可能不可用：忽略并回落到默认主题
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>本站是纯前端演示项目，需要启用 JavaScript 才能浏览。</noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

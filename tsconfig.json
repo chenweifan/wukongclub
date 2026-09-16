@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    /* 目标与模块：Vite 负责打包，tsc 只做类型检查（noEmit） */
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+    "jsx": "react-jsx",
+    "useDefineForClassFields": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+
+    /* 严格性：协议第九节要求，禁止 any / @ts-ignore */
+    "strict": true,
+    "noImplicitOverride": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* 路径别名：@ → src（与 vite.config.ts 的 resolve.alias 保持一致） */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+
+    "types": ["node", "vitest/globals"]
+  },
+  "include": ["src", "vite.config.ts", "tailwind.config.ts"]
+}
