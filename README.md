@@ -32,8 +32,11 @@ Vite · React 18 · TypeScript(strict) · react-router-dom v6 Data Router ·
 Radix 无样式原语 · framer-motion · TipTap · react-virtual · ECharts · dnd-kit ·
 MSW + faker · Dexie · lz-string · html-to-image · driver.js · Vitest + Playwright · Storybook
 
-> 依赖按阶段推进逐步引入：当前（阶段 0）只安装骨架与测试所必需的包，
-> 阶段 1/2/3 会依次引入 MSW、Dexie、Radix、framer-motion 等，不新增清单外依赖。
+> 依赖按阶段推进逐步引入。**阶段 1 已引入**：msw、@faker-js/faker、dexie、
+> framer-motion、driver.js、@radix-ui/react-dialog、@radix-ui/react-switch，
+> 以及开发期的 fake-indexeddb（jsdom 没有 IndexedDB，Dexie 与 MSW 链路需要它才能测）。
+> 阶段 2/3 会继续引入 TipTap、react-virtual、ECharts、dnd-kit、lz-string、html-to-image，
+> 全部来自协议清单，不新增清单外依赖。
 
 ## 目录结构
 
@@ -45,7 +48,7 @@ src/
 ├─ entities/     跨特性共享的领域模型与组件
 ├─ components/   ui（无业务语义）/ business（含业务语义）
 ├─ data/         contracts / repositories / mocks / db / seeds  ← 所有数据的唯一出口
-├─ demo/         演示系统：scenarios / tours / fixtures（阶段 1）
+├─ demo/         演示系统：store / urlState / scenarios / tours / console / panels / snapshot
 ├─ stores/       zustand 客户端状态
 ├─ hooks/        通用 hooks
 ├─ utils/        纯函数工具与集中文案
@@ -78,24 +81,89 @@ src/
 基础令牌：`--hmw-ink` `--hmw-ink-2` `--hmw-gold` `--hmw-gold-hi` `--hmw-cinnabar`
 `--hmw-paper` `--hmw-jade` `--radius-scroll` `--shadow-seal`。
 
-## 阶段 0 临时验证手段
+## DEMO 演示系统（阶段 1）
 
-阶段 0 的 `DemoProvider` 是空实现（演示控制台属于阶段 1）。若想查看 `/admin` 放行后的后台布局，
-可在浏览器控制台执行：
+「演示优先」是这个项目的核心卖点：**任何界面状态都能用一条 URL 复现**。
+右下角葫芦打开演示控制台；所有开关都会实时写回地址栏（`replaceState`，不污染浏览器历史）。
 
-```js
-localStorage.setItem('hmw:demo-role', 'admin'); // 可选值：guest/newbie/active/moderator/admin/banned
-location.reload();
+### URL 参数
+
+| 参数      | 取值                                                   | 说明                         |
+| --------- | ------------------------------------------------------ | ---------------------------- |
+| `demo`    | `1` / `0`                                              | 进入演示模式（含控制台）     |
+| `role`    | `guest` `newbie` `active` `moderator` `admin` `banned` | 身份，决定权限与可见内容     |
+| `ui`      | `normal` `empty` `loading` `error` `slow` `offline`    | 覆盖所有异步 UI 的状态       |
+| `theme`   | `ink` `paper` `contrast`                               | 主题                         |
+| `spoiler` | `1` / `0`                                              | 剧透开关                     |
+| `seed`    | 整数                                                   | 种子数据随机种子（可复现）   |
+| `time`    | ISO 时间                                               | 冻结时间                     |
+| `tour`    | `first-visit` `console-guide`                          | 自动启动的引导剧本           |
+| `clean`   | `1` / `0`                                              | 截图模式：隐藏控制台与提示条 |
+| `grid`    | `1` / `0`                                              | 布局栅格                     |
+| `record`  | `1`                                                    | 记录操作路径（内存，可导出） |
+
+示例：
+
+```
+/?demo=1&role=admin&ui=offline&theme=contrast&spoiler=0&seed=666&clean=1
+/?demo=1&tour=first-visit
 ```
 
-阶段 1 会用 DemoConsole + URL query 取代这层临时兜底，该 localStorage 键会被移除。
+> 演示模式开启时所有字段都会显式写进 URL（链接自描述，换台机器打开结果一致）；
+> 关闭时演示参数会被摘掉，且**不会**动 `?build=...` 这类第三方参数。
+
+### 控制台分区
+
+身份 · 界面状态 · 主题 · 剧透 · 数据（重置 / 填满 / 清空 / 导出快照 / 导入快照）·
+引导（剧本 + 启动）· 场景（预设 + 应用）· 工具（栅格 / 组件边界 / 性能面板 / 复制演示链接 / 操作记录）。
+
+### 预设场景
+
+| id              | 名称       | 说明                                       |
+| --------------- | ---------- | ------------------------------------------ |
+| `first-visit`   | 首次到访   | 基线数据 + 跨页引导                        |
+| `spoiler-free`  | 零剧透浏览 | 剧透全关、宣纸主题，适合分享给未通关的朋友 |
+| `build-master`  | 配装大师   | 直奔配装模拟器 + 满量数据                  |
+| `moderate-flow` | 版主值班   | 版主身份进论坛，预演审核动线               |
+| `empty-launch`  | 空数据首启 | 清空全部本地数据，检查空态                 |
+| `chaos`         | 混沌故障   | 断网 + 封禁 + 高对比 + 栅格，压满异常态    |
+| `event-season`  | 赛季活动   | 活动中心 + 满量数据                        |
+
+场景切换 = 应用状态 patch + 可选重置种子数据 + 跳转路由 + 可选启动引导。
+链接复现的是**状态**；要连数据一起复现，请用快照导入导出（两者互补）。
+
+### 引导剧本
+
+- `first-visit`：八步走完站点骨架，中途跨页跳转（`/` → `/wiki` → `/`）再回来。
+- `console-guide`：控制台六个分区逐个讲解（启动时自动展开控制台）。
+
+键盘 `←` `→` 翻页、`Esc` 退出；步骤只写路由与选择器，文案集中在
+`src/demo/fixtures/tourCopy.ts`。单测会校验每个 `data-tour` 锚点在源码里真实存在。
+
+### 数据快照
+
+导出内容：`{ version, app, exportedAt, demoState, db, ls }` ——
+`db` 是 Dexie 全量，`ls` 只含 `hmw:` 前缀的本地存储。
+导入会校验版本与结构，脏记录被逐条过滤，非 `hmw:` 键一律拒绝写入。
+
+### 演示系统如何接管数据
+
+- `<StateBoundary>`：所有异步 UI 的统一边界。它优先服从 `uiState`
+  （`error` / `offline` / `loading` / `empty` 直接覆盖），`normal` / `slow` 则回落到真实查询状态。
+- `mockDelay()` / `mockError()`：所有 MSW handler 必须先 `mockError()` 再 `await mockDelay()`；
+  `slow` 注入 3–5s 延迟，`offline` 抛 `HttpError(0)`，`error` 抛 `HttpError(500, '灵蕴紊乱')`。
+- 已知架构例外：`src/data/mocks/**` 允许读取 `demoStore`（协议 6.3 的写法就是
+  `useDemoStore.getState()`）。除此之外数据层不认识演示状态。
+- 首页底部的「演示系统自检 · 探针列表」是阶段 1 的验收实物：它真实走
+  Repository → MSW → IndexedDB，可勾选（写操作持久化），也会被快照一起备份。
+  阶段 2 起会被真实业务列表取代。
 
 ## 进度
 
 | 阶段 | 内容                                                                                     | 状态      |
 | ---- | ---------------------------------------------------------------------------------------- | --------- |
 | 0    | 项目骨架（工程配置 / 目录 / 令牌三主题 / Providers / 路由守卫 / 三布局 / 占位页 / Home） | ✅ 已交付 |
-| 1    | DEMO 演示系统（URL 双向同步 / StateBoundary / 葫芦控制台 / 场景 / 引导 / 快照）          | 待开始    |
-| 2    | 核心业务：用户成长 → 影神图 → 资讯 → 攻略 → 论坛 → 个人主页                              | 未开始    |
+| 1    | DEMO 演示系统（URL 双向同步 / StateBoundary / 葫芦控制台 / 7 场景 / 引导 / 快照 / 录制） | ✅ 已交付 |
+| 2    | 核心业务：用户成长 → 影神图 → 资讯 → 攻略 → 论坛 → 个人主页                              | 待开始    |
 | 3    | 高级功能：配装模拟器 → 互动地图 → 收集追踪 → 二创 → 活动 → 灵蕴商城 → 后台               | 未开始    |
 | 4    | 审查 / 重构 / E2E / 性能 / 交付文档                                                      | 未开始    |
