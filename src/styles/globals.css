@@ -1,0 +1,97 @@
+/* =========================================================================
+   src/styles/globals.css
+   基础层：只做「元素默认值」与少量东方质感工具类，不承载任何组件样式。
+   ========================================================================= */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    background-color: var(--hmw-bg);
+    /* 主题切换做一次短过渡，避免墨黑↔宣纸之间闪白 */
+    transition:
+      background-color var(--hmw-duration-base) ease,
+      color var(--hmw-duration-base) ease;
+  }
+
+  body {
+    @apply bg-bg font-body text-content antialiased;
+    margin: 0;
+    min-height: 100vh;
+    line-height: 1.7;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display;
+    line-height: 1.3;
+    letter-spacing: 0.02em;
+  }
+
+  /* 焦点可见性：键盘可达性的底线，主题切换时颜色随 --hmw-focus 变化 */
+  :focus-visible {
+    outline: 2px solid var(--hmw-focus);
+    outline-offset: 2px;
+    border-radius: var(--hmw-radius-sm);
+  }
+
+  ::selection {
+    background-color: var(--hmw-accent);
+    color: var(--hmw-accent-ink);
+  }
+
+  /* 细窄滚动条，避免默认滚动条破坏墨色氛围 */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--hmw-border-strong) transparent;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /* 宣纸噪点 / 墨色颗粒：用内联 SVG feTurbulence 生成，避免引入二进制素材。
+     contrast 主题把 --hmw-grain-opacity 置 0，本效果自动失效。 */
+  .texture-grain {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .texture-grain::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: var(--hmw-grain-opacity);
+    mix-blend-mode: overlay;
+    border-radius: inherit;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23noise)'/%3E%3C/svg%3E");
+  }
+
+  /* 影神图卡片 / 卷轴面板的通用外壳：浮雕边框 + 印章投影 */
+  .panel-scroll {
+    @apply bg-surface border-token border-line rounded-scroll;
+    box-shadow: var(--hmw-shadow-1);
+  }
+
+  /* 印章式色块：用于 Tag / 徽记 */
+  .stamp {
+    @apply border-token border-line rounded-sm px-2 py-0.5 text-xs;
+    color: var(--hmw-accent);
+    background-color: color-mix(in srgb, var(--hmw-accent) 12%, transparent);
+  }
+}

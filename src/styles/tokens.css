@@ -1,0 +1,124 @@
+/* =========================================================================
+   src/styles/tokens.css
+   设计令牌唯一来源。约定（协议第五节 / 第七节）：
+   1. 原始色值只允许出现在本文件的「基础色板」与「主题」区块；
+   2. 组件层只允许使用语义令牌（--hmw-bg / --hmw-text / --hmw-accent ...）；
+   3. 三套主题共用同一组变量名，切换 <html data-theme> 即可整体换肤。
+   ========================================================================= */
+
+:root {
+  /* ===== 基础色板（协议锁定，勿在别处硬编码） ===== */
+  --hmw-ink: #0b0b0d; /* 墨黑底 */
+  --hmw-ink-2: #16161a; /* 次级墨黑，用于面板/卡片 */
+  --hmw-gold: #c8a96a; /* 鎏金主色 */
+  --hmw-gold-hi: #e8ce96; /* 高亮鎏金 */
+  --hmw-cinnabar: #a62b2b; /* 朱砂强调 */
+  --hmw-paper: #e8e2d6; /* 宣纸 */
+  --hmw-jade: #4a7c6f; /* 灵蕴青 */
+  --radius-scroll: 4px; /* 卷轴圆角 */
+  --shadow-seal: 0 2px 12px rgb(200 169 106 / 0.25); /* 印章投影 */
+
+  /* ===== 字体：只用本地/系统字体栈，不引外链字体（离线可跑、无隐私外泄） ===== */
+  --font-display:
+    'Source Han Serif SC', 'Noto Serif SC', 'LXGW WenKai', 'Songti SC', 'STSong', 'SimSun', serif;
+  --font-body:
+    'Source Han Sans SC', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui,
+    -apple-system, 'Segoe UI', sans-serif;
+
+  /* ===== 尺度令牌：4px 基准；Tailwind 数字档位（p-1=4px / p-2=8px ...）与此一致 ===== */
+  --hmw-space-1: 4px;
+  --hmw-space-2: 8px;
+  --hmw-space-3: 12px;
+  --hmw-space-4: 16px;
+  --hmw-space-6: 24px;
+  --hmw-space-8: 32px;
+  --hmw-space-12: 48px;
+  --hmw-radius-sm: 2px;
+  --hmw-radius-md: 4px;
+  --hmw-radius-lg: 8px;
+  --hmw-border-w: 1px;
+  --hmw-page-max: 1280px;
+
+  /* ===== 布局尺寸：供纯 CSS / 内联 style 使用（Tailwind 侧映射为 w-sidebar 等） ===== */
+  --hmw-nav-h: 64px;
+  --hmw-sidebar-w: 232px;
+  --hmw-sidebar-w-collapsed: 72px;
+
+  /* ===== 动效：尊重 prefers-reduced-motion（见 globals.css） ===== */
+  --hmw-duration-fast: 120ms;
+  --hmw-duration-base: 240ms;
+}
+
+/* =========================================================================
+   主题 1 · ink（墨黑，默认）
+   分组选择器让 :root 直接具备完整语义变量，避免无 data-theme 时变量悬空。
+   ========================================================================= */
+:root,
+[data-theme='ink'] {
+  --hmw-bg: var(--hmw-ink);
+  --hmw-surface: var(--hmw-ink-2);
+  --hmw-surface-2: #1f1f26;
+  --hmw-text: #ece6d9;
+  --hmw-text-muted: #9c968a;
+  --hmw-border: rgb(200 169 106 / 0.22);
+  --hmw-border-strong: rgb(200 169 106 / 0.45);
+  --hmw-accent: var(--hmw-gold);
+  --hmw-accent-hi: var(--hmw-gold-hi);
+  --hmw-accent-ink: #14140f; /* 放在 accent 之上的文字色 */
+  --hmw-danger: #c2453f; /* 朱砂在墨底上提亮，保证可读性 */
+  --hmw-spirit: #5c9c8b; /* 灵蕴青在墨底上提亮 */
+  --hmw-focus: var(--hmw-gold-hi);
+  --hmw-overlay: rgb(11 11 13 / 0.72);
+  --hmw-shadow-1: 0 4px 24px rgb(0 0 0 / 0.45);
+  --hmw-grain-opacity: 0.06;
+  color-scheme: dark;
+}
+
+/* =========================================================================
+   主题 2 · paper（宣纸，浅色）
+   注意：鎏金在宣纸底上对比度不足，此处压深为 #8a6a2b，是刻意的可读性取舍。
+   ========================================================================= */
+[data-theme='paper'] {
+  --hmw-bg: var(--hmw-paper);
+  --hmw-surface: #f4f0e7;
+  --hmw-surface-2: #fffdf8;
+  --hmw-text: #17171a;
+  --hmw-text-muted: #5b564c;
+  --hmw-border: rgb(23 23 26 / 0.16);
+  --hmw-border-strong: rgb(23 23 26 / 0.34);
+  --hmw-accent: #8a6a2b;
+  --hmw-accent-hi: #6e5320;
+  --hmw-accent-ink: #fffdf8;
+  --hmw-danger: var(--hmw-cinnabar);
+  --hmw-spirit: #37685c;
+  --hmw-focus: #6e5320;
+  --hmw-overlay: rgb(23 23 26 / 0.45);
+  --hmw-shadow-1: 0 4px 20px rgb(23 23 26 / 0.14);
+  --hmw-grain-opacity: 0.09;
+  color-scheme: light;
+}
+
+/* =========================================================================
+   主题 3 · contrast（高对比无障碍）
+   关闭噪点与投影、边框加粗到 2px、强调色换成高亮黄/青，满足 AA 以上对比。
+   ========================================================================= */
+[data-theme='contrast'] {
+  --hmw-bg: #000000;
+  --hmw-surface: #0a0a0a;
+  --hmw-surface-2: #141414;
+  --hmw-text: #ffffff;
+  --hmw-text-muted: #e0e0e0;
+  --hmw-border: #ffffff;
+  --hmw-border-strong: #ffffff;
+  --hmw-accent: #ffd24a;
+  --hmw-accent-hi: #fff0b8;
+  --hmw-accent-ink: #000000;
+  --hmw-danger: #ff8a8a;
+  --hmw-spirit: #7be3c8;
+  --hmw-focus: #7fe7ff;
+  --hmw-overlay: rgb(0 0 0 / 0.85);
+  --hmw-shadow-1: none;
+  --hmw-grain-opacity: 0;
+  --hmw-border-w: 2px;
+  color-scheme: dark;
+}
