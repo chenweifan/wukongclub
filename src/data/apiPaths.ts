@@ -30,6 +30,11 @@ export const API_PATHS = {
     favorites: '/api/wiki/favorites',
     favorite: '/api/wiki/favorites/:entryId',
   },
+  news: {
+    articles: '/api/news',
+    tags: '/api/news/tags',
+    article: '/api/news/:newsId',
+  },
 } as const;
 
 /**

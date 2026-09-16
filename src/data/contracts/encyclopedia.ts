@@ -1,4 +1,5 @@
-import { isRecord } from '@/data/contracts/common';
+import { isRecord, isSpoilerLevel } from '@/data/contracts/common';
+import type { SpoilerLevel } from '@/data/contracts/common';
 
 /**
  * 影神图百科契约（协议 6.1 给出的形状，逐字段落地）。
@@ -32,10 +33,9 @@ export const CHAPTER_NAMES: Record<Chapter, string> = {
   6: '花果山',
 };
 
-/** 剧透级别：0 可安全展示，1 含战斗/剧情信息，2 含结局级信息。 */
-export const SPOILER_LEVELS = [0, 1, 2] as const;
-
-export type SpoilerLevel = (typeof SPOILER_LEVELS)[number];
+/** 剧透级别见 common.ts（站级立场，多个域共用）。这里 re-export 保持既有导入路径不变。 */
+export { SPOILER_LEVELS, isSpoilerLevel } from '@/data/contracts/common';
+export type { SpoilerLevel } from '@/data/contracts/common';
 
 export interface WikiEntry {
   id: string;
@@ -65,10 +65,6 @@ export function isRarity(value: unknown): value is Rarity {
 
 export function isChapter(value: unknown): value is Chapter {
   return typeof value === 'number' && (CHAPTERS as readonly number[]).includes(value);
-}
-
-export function isSpoilerLevel(value: unknown): value is SpoilerLevel {
-  return typeof value === 'number' && (SPOILER_LEVELS as readonly number[]).includes(value);
 }
 
 export function isWikiEntry(value: unknown): value is WikiEntry {

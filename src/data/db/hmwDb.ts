@@ -2,6 +2,7 @@ import Dexie from 'dexie';
 import type { Table } from 'dexie';
 
 import type { CheckInRecord } from '@/data/contracts/growth';
+import type { NewsArticle } from '@/data/contracts/news';
 import type { WikiEntry } from '@/data/contracts/encyclopedia';
 import type { DemoProbe } from '@/data/contracts/demoProbe';
 import type { FavoriteRecord, NotificationRecord, TaskRecord, UserRecord } from '@/data/db/records';
@@ -19,8 +20,10 @@ export const HMW_DB_NAME = 'hmw-db';
  *
  * 版本演进：
  * - v1：probes（阶段 1 的演示自检数据）
- * - v2：阶段 2 用户成长域新增 users / checkins / tasks / notifications。
- *   每次升级都要重复写全部表定义，这是 Dexie 的约定（不是冗余）。
+ * - v2：用户成长域 users / checkins / tasks / notifications
+ * - v3：影神图 wikiEntries / favorites
+ * - v4：资讯 newsArticles
+ * 每次升级都要重复写全部表定义，这是 Dexie 的约定（不是冗余）。
  */
 export class HmwDatabase extends Dexie {
   declare readonly probes: Table<DemoProbe, string>;
@@ -30,6 +33,7 @@ export class HmwDatabase extends Dexie {
   declare readonly notifications: Table<NotificationRecord, string>;
   declare readonly wikiEntries: Table<WikiEntry, string>;
   declare readonly favorites: Table<FavoriteRecord, string>;
+  declare readonly newsArticles: Table<NewsArticle, string>;
 
   constructor() {
     super(HMW_DB_NAME);
@@ -55,6 +59,18 @@ export class HmwDatabase extends Dexie {
       notifications: 'id, userId, category, read, createdAt',
       wikiEntries: 'id, category, chapter, rarity, name',
       favorites: 'id, ownerId, entryId, [ownerId+entryId]',
+    });
+
+    // v4：资讯（聚合列表）。pinned 与 publishedAt 建索引，置顶与时间线排序都靠它。
+    this.version(4).stores({
+      probes: 'id, category, collected, createdAt',
+      users: 'id, &username',
+      checkins: 'id, userId, date, [userId+date]',
+      tasks: 'id, userId, kind, [userId+periodKey]',
+      notifications: 'id, userId, category, read, createdAt',
+      wikiEntries: 'id, category, chapter, rarity, name',
+      favorites: 'id, ownerId, entryId, [ownerId+entryId]',
+      newsArticles: 'id, category, publishedAt, pinned',
     });
   }
 }

@@ -1,5 +1,6 @@
 import type { DemoProbe } from '@/data/contracts/demoProbe';
 import { clearWikiTables, seedWikiEntries } from '@/data/db/encyclopediaData';
+import { clearNewsTable, seedNewsArticles } from '@/data/db/newsData';
 import { clearGrowthTables, seedDemoGrowth } from '@/data/db/growthData';
 import { isDataInitialized, markDataInitialized } from '@/data/db/dataFlags';
 import { hmwDb } from '@/data/db/hmwDb';
@@ -41,12 +42,13 @@ export async function seedProbes(count: number, seed: number): Promise<number> {
 }
 
 /**
- * 重置：回到基线数据（探针 + 影神图词条 + 演示账号 + 成长数据）。
+ * 重置：回到基线数据（探针 + 影神图词条 + 资讯 + 演示账号 + 成长数据）。
  * 阶段 2 起，「重置」不再只清探针 —— 评审点它时期望的是回到一个完整可演示的初始状态。
  */
 export async function resetDemoData(seed: number, now: Date = new Date()): Promise<number> {
   const probeCount = await seedProbes(BASELINE_PROBE_COUNT, seed);
   await seedWikiEntries();
+  await seedNewsArticles(now);
   const user = await ensureDemoUser(now);
   await clearGrowthTables();
   await seedDemoGrowth(user.id, now);
@@ -57,6 +59,7 @@ export async function resetDemoData(seed: number, now: Date = new Date()): Promi
 export async function fillDemoData(seed: number, now: Date = new Date()): Promise<number> {
   const probeCount = await seedProbes(FILLED_PROBE_COUNT, seed);
   await seedWikiEntries();
+  await seedNewsArticles(now);
   const user = await ensureDemoUser(now);
   await seedDemoGrowth(user.id, now);
   return probeCount;
@@ -81,6 +84,7 @@ export async function clearAllData(): Promise<{ clearedKeys: number }> {
     },
   );
   await clearWikiTables();
+  await clearNewsTable();
   await clearUserTable();
 
   const clearedKeys = clearHmwEntries(window.localStorage);
@@ -100,6 +104,7 @@ export async function ensureFirstRunSeed(seed: number, now: Date = new Date()): 
 
   await seedProbes(BASELINE_PROBE_COUNT, seed);
   await seedWikiEntries();
+  await seedNewsArticles(now);
   const user = await ensureDemoUser(now);
   await seedDemoGrowth(user.id, now);
   return true;

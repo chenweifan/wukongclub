@@ -2,6 +2,7 @@ import { demoHandlers } from '@/data/mocks/handlers/demo';
 import { authHandlers } from '@/data/mocks/handlers/auth';
 import { encyclopediaHandlers } from '@/data/mocks/handlers/encyclopedia';
 import { growthHandlers } from '@/data/mocks/handlers/growth';
+import { newsHandlers } from '@/data/mocks/handlers/news';
 
 /**
  * 全部 mock handler 的注册表（协议：新 mock 必须注册进 browser.ts）。
@@ -12,4 +13,5 @@ export const handlers = [
   ...authHandlers,
   ...growthHandlers,
   ...encyclopediaHandlers,
+  ...newsHandlers,
 ];

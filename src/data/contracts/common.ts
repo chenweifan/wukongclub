@@ -60,3 +60,18 @@ export function toPaginated<T>(
     pageSize,
   };
 }
+
+/**
+ * 剧透级别：0 可安全展示，1 含战斗/剧情信息，2 含结局级信息。
+ *
+ * 放在 common 而不是某个域的契约里：影神图、资讯、论坛都要用它，
+ * 而「剧透」是站级立场（默认不剧透），不属于某一个业务域。
+ * encyclopedia.ts 会 re-export，保持既有导入路径不变。
+ */
+export const SPOILER_LEVELS = [0, 1, 2] as const;
+
+export type SpoilerLevel = (typeof SPOILER_LEVELS)[number];
+
+export function isSpoilerLevel(value: unknown): value is SpoilerLevel {
+  return typeof value === 'number' && (SPOILER_LEVELS as readonly number[]).includes(value);
+}

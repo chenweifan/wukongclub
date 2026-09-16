@@ -10,3 +10,5 @@ export { growthRepo } from '@/data/repositories/growthRepo';
 export type { GrowthRepository } from '@/data/repositories/growthRepo';
 export { encyclopediaRepo } from '@/data/repositories/encyclopediaRepo';
 export type { EncyclopediaRepository } from '@/data/repositories/encyclopediaRepo';
+export { newsRepo } from '@/data/repositories/newsRepo';
+export type { NewsRepository } from '@/data/repositories/newsRepo';
