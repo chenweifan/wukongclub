@@ -23,6 +23,13 @@ export const API_PATHS = {
     readNotification: '/api/notifications/:notificationId/read',
     readAllNotifications: '/api/notifications/read-all',
   },
+  wiki: {
+    entries: '/api/wiki/entries',
+    entry: '/api/wiki/entries/:entryId',
+    graph: '/api/wiki/entries/:entryId/graph',
+    favorites: '/api/wiki/favorites',
+    favorite: '/api/wiki/favorites/:entryId',
+  },
 } as const;
 
 /**

@@ -33,6 +33,17 @@ export interface NotificationRecord extends NotificationItem {
   userId: string;
 }
 
+/**
+ * 收藏记录：ownerId 既可能是 `user:<id>` 也可能是 `device:<id>`。
+ * 一张表两种归属，避免「登录前后收藏列表分叉」这种典型体验问题。
+ */
+export interface FavoriteRecord {
+  id: string;
+  ownerId: string;
+  entryId: string;
+  createdAt: string;
+}
+
 /** 去掉密码摘要。少一个字段就少一条泄漏路径。 */
 export function toPublicUser(record: UserRecord): User {
   const { passwordDigest: _passwordDigest, ...user } = record;

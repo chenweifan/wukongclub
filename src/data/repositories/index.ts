@@ -8,3 +8,5 @@ export { authRepo } from '@/data/repositories/authRepo';
 export type { AuthRepository } from '@/data/repositories/authRepo';
 export { growthRepo } from '@/data/repositories/growthRepo';
 export type { GrowthRepository } from '@/data/repositories/growthRepo';
+export { encyclopediaRepo } from '@/data/repositories/encyclopediaRepo';
+export type { EncyclopediaRepository } from '@/data/repositories/encyclopediaRepo';

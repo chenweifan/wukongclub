@@ -1,4 +1,5 @@
 import { buildAuthHeaders } from '@/data/authToken';
+import { buildDeviceHeaders } from '@/data/deviceId';
 import { HttpError } from '@/data/HttpError';
 import { isApiErrorBody } from '@/data/contracts/common';
 
@@ -17,6 +18,10 @@ export async function requestJson(url: string, init?: RequestInit): Promise<unkn
 
   const headers = new Headers(init?.headers);
   for (const [key, value] of Object.entries(buildAuthHeaders())) {
+    headers.set(key, value);
+  }
+  // 设备标识始终带上：未登录时的收藏等「设备级」数据靠它归属
+  for (const [key, value] of Object.entries(buildDeviceHeaders())) {
     headers.set(key, value);
   }
 

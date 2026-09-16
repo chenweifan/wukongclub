@@ -1,4 +1,5 @@
 import type { DemoProbe } from '@/data/contracts/demoProbe';
+import { clearWikiTables, seedWikiEntries } from '@/data/db/encyclopediaData';
 import { clearGrowthTables, seedDemoGrowth } from '@/data/db/growthData';
 import { isDataInitialized, markDataInitialized } from '@/data/db/dataFlags';
 import { hmwDb } from '@/data/db/hmwDb';
@@ -40,26 +41,31 @@ export async function seedProbes(count: number, seed: number): Promise<number> {
 }
 
 /**
- * 重置：回到基线数据（探针 + 演示账号 + 成长数据）。
+ * 重置：回到基线数据（探针 + 影神图词条 + 演示账号 + 成长数据）。
  * 阶段 2 起，「重置」不再只清探针 —— 评审点它时期望的是回到一个完整可演示的初始状态。
  */
 export async function resetDemoData(seed: number, now: Date = new Date()): Promise<number> {
   const probeCount = await seedProbes(BASELINE_PROBE_COUNT, seed);
+  await seedWikiEntries();
   const user = await ensureDemoUser(now);
   await clearGrowthTables();
   await seedDemoGrowth(user.id, now);
   return probeCount;
 }
 
-/** 填满：写入足量数据，用于验证长列表与后续虚拟滚动。 */
+/** 填满：写入足量数据，用于验证长列表与虚拟滚动。 */
 export async function fillDemoData(seed: number, now: Date = new Date()): Promise<number> {
   const probeCount = await seedProbes(FILLED_PROBE_COUNT, seed);
+  await seedWikiEntries();
   const user = await ensureDemoUser(now);
   await seedDemoGrowth(user.id, now);
   return probeCount;
 }
 
-/** 清空：本地库全部清表 + localStorage 按 hmw: 前缀清理（协议 1.7 的 resetAll 语义）。 */
+/**
+ * 清空：本地库全部清表（含影神图这类内容数据）+ localStorage 按 hmw: 前缀清理
+ * （协议 1.7 的 resetAll 语义）。清空后百科会展示空态，这正是「空数据首启」场景要看的。
+ */
 export async function clearAllData(): Promise<{ clearedKeys: number }> {
   await hmwDb.transaction(
     'rw',
@@ -74,6 +80,7 @@ export async function clearAllData(): Promise<{ clearedKeys: number }> {
       await hmwDb.notifications.clear();
     },
   );
+  await clearWikiTables();
   await clearUserTable();
 
   const clearedKeys = clearHmwEntries(window.localStorage);
@@ -83,7 +90,7 @@ export async function clearAllData(): Promise<{ clearedKeys: number }> {
 
 /**
  * 首次进入站点时播种基线数据；已初始化过则什么都不做。
- * 演示账号与成长数据一并准备好，否则首访者进「我的」会看到一片空白，
+ * 演示账号、成长数据与影神图词条一并准备好，否则首访者看到的是一座空站，
  * 分不清是「还没登录」还是「数据没种上」。
  */
 export async function ensureFirstRunSeed(seed: number, now: Date = new Date()): Promise<boolean> {
@@ -92,6 +99,7 @@ export async function ensureFirstRunSeed(seed: number, now: Date = new Date()): 
   }
 
   await seedProbes(BASELINE_PROBE_COUNT, seed);
+  await seedWikiEntries();
   const user = await ensureDemoUser(now);
   await seedDemoGrowth(user.id, now);
   return true;
