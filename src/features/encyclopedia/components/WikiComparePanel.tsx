@@ -98,7 +98,7 @@ export function WikiComparePanel({ entries, onRemove, onClear, onOpen }: WikiCom
               <CompareRow
                 label={COPY.wiki.compare.field.spoiler}
                 entries={entries}
-                render={(entry) => COPY.wiki.detail.spoilerLevel[entry.spoilerLevel]}
+                render={(entry) => COPY.spoiler.levels[entry.spoilerLevel]}
               />
               <CompareRow
                 label={COPY.wiki.compare.field.alias}

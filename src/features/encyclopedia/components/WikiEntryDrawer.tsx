@@ -123,7 +123,7 @@ export function WikiEntryDrawer({
                         <div className="flex gap-2">
                           <dt>{COPY.wiki.compare.field.spoiler}</dt>
                           <dd className="text-content">
-                            {COPY.wiki.detail.spoilerLevel[entry.spoilerLevel]}
+                            {COPY.spoiler.levels[entry.spoilerLevel]}
                           </dd>
                         </div>
                       </dl>

@@ -127,6 +127,20 @@ export const COPY = {
     dangerHint: '该操作不可撤销',
   },
 
+  /** 剧透遮罩：站级立场，影神图 / 资讯 / 论坛共用同一套文案。 */
+  spoiler: {
+    levels: {
+      0: '无剧透',
+      1: '含剧情信息',
+      2: '含结局级信息',
+    },
+    reveal: '揭开这一条',
+    revealed: '已揭开',
+    title: '这条内容含剧透，默认遮罩',
+    offNotice: '当前已开启剧透保护：含剧透内容需要手动揭开。',
+    onNotice: '剧透保护已关闭：含剧透内容直接显示（可在顶栏切换）。',
+  },
+
   /** 演示模式与控制台文案。 */
   demo: {
     banner: '演示模式 · 数据为本地模拟',
@@ -458,12 +472,62 @@ export const COPY = {
       graphHint: '拖动节点可调整布局，滚轮缩放；点击节点切换中心词条。',
       graphLoading: '图谱加载中…',
       graphEmpty: '这条词条暂时没有关联数据。',
-      spoilerLevel: {
-        0: '无剧透',
-        1: '含剧情信息',
-        2: '含结局级信息',
-      },
       missing: '词条不存在，可能已被「清空数据」移除。',
     },
+  },
+
+  /** 资讯（阶段 2 模块三）。 */
+  news: {
+    title: '资讯',
+    description: '聚合官方渠道动态与本站编辑内容；含剧透的条目默认遮罩，点开才看。',
+    demoNotice: '本页为演示数据，不代表任何官方信息；来源按钮指向真实渠道首页。',
+    searchLabel: '搜索资讯',
+    searchPlaceholder: '标题、摘要、来源或标签',
+    filterCategory: '类目',
+    filterTag: '标签',
+    sortLabel: '排序',
+    sort: {
+      latest: '最新在前',
+      oldest: '最早在前',
+    },
+    all: '全部',
+    category: {
+      official: '官方',
+      update: '版本',
+      event: '活动',
+      media: '影像',
+      community: '社区',
+    },
+    tag: {
+      version: '版本更新',
+      balance: '平衡性',
+      dlc: '后续内容',
+      art: '美术',
+      music: '音乐',
+      interview: '访谈',
+      esports: '赛事',
+      merch: '周边',
+      guide: '攻略',
+      community: '社区',
+    },
+    sourceKind: {
+      official: '官方渠道',
+      media: '媒体渠道',
+      community: '社区渠道',
+      editorial: '本站编辑',
+    },
+    resultCount: (count: number): string => `${count} 条资讯`,
+    resultCountFiltered: (matched: number, total: number): string => `${matched} / ${total} 条资讯`,
+    empty: '没有符合条件的资讯',
+    emptyHint: '试试清空筛选，或换一个关键词。',
+    resetFilters: '清空筛选',
+    pinned: '置顶',
+    expand: '展开正文',
+    collapse: '收起正文',
+    openSource: '查看来源',
+    noSource: '本站编辑内容，没有外部来源',
+    maskedNotice: (count: number): string => `其中 ${count} 条含剧透，已遮罩`,
+    timelineToday: '今天',
+    timelineYesterday: '昨天',
   },
 } as const;
